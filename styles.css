@@ -103,6 +103,7 @@ header {
     margin: 0;
   }
 
+  nav,
   address {
     text-align: right;
     font-style: normal;
