@@ -6,8 +6,13 @@
       </a>
     </li>
     <li>
+      <a href="{{ '/writing.html' | relative_url }}"{% if page.page_id == 'writing' %} aria-current="page"{% endif %}>
+        Writing
+      </a>
+    </li>
+    <li>
       <a href="{{ '/resume.html' | relative_url }}"{% if page.page_id == 'resume' %} aria-current="page"{% endif %}>
-        Resume
+        Résumé
       </a>
     </li>
     <li>

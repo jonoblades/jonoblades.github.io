@@ -19,11 +19,14 @@
 <body>
   <header>
     <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="site-title" href="{{ '/' | relative_url }}">
+      Jonathan Blades
+    </a>
     <label class="theme-toggle" for="theme-toggle">
       <input class="visually-hidden" type="checkbox" role="switch" id="theme-toggle" name="theme-toggle">
       <span class="visually-hidden">Use opposite colour theme.</span>
     </label>
-    <h1>Jonathan Blades</h1>
+    <h1>{{ page.heading | default: page.title }}</h1>
     {% include navigation.html %}
     <div class="job-title">
       <span>{{ page.subtitle }}</span>

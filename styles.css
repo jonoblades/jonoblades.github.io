@@ -55,7 +55,7 @@ body {
   color: var(--text-colour);
 
   margin: 0;
-  padding: 0 var(--spacing-large);
+  padding: var(--spacing-standard);
 
   font-family: var(--font-family);
   font-size: var(--font-size);
@@ -76,7 +76,6 @@ body {
 }
 
 header,
-main,
 footer {
   max-width: 100ch;
   width: 100%;
@@ -147,7 +146,6 @@ section {
 
 footer {
   text-align: center;
-  padding-bottom: var(--spacing-large);
 }
 
 h1,
@@ -214,16 +212,33 @@ dl {
 .skip-link {
   position: absolute;
   top: 0;
-  left: var(--spacing-standard);
+  left: 50%;
   z-index: 10;
   padding: var(--spacing-small) var(--spacing-standard);
   color: var(--bg);
   background: var(--text-colour);
-  transform: translateY(-120%);
+  transform: translateY(-120%) translateX(-50%);
 }
 
 .skip-link:focus {
-  transform: translateY(0);
+  transform: translateY(var(--spacing-standard)) translateX(-50%);
+}
+
+.site-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(3 * var(--spacing-standard));
+  padding: 0 var(--spacing-standard);
+  background-color: var(--bg-contrast);
+  color: var(--bg);
+  border-bottom-right-radius: var(--spacing-standard);
+
+  display: flex;
+  align-items: center;
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 700;
 }
 
 .visually-hidden {
@@ -327,22 +342,22 @@ dl {
   font-size: 1.2em;
 }
 
-.company {
+.item-details {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-standard);
 
-  .company-name {
+  .item-primary {
     font-weight: 700;
   }
 
-  .dates {
+  .item-secondary {
     font-style: italic;
   }
 }
 
-.selected-work {
+.highlighted-items {
   article {
     padding-inline-start: var(--spacing-standard);
     border-inline-start: 0.25rem solid var(--accent-colour);
@@ -357,7 +372,7 @@ dl {
   }
 }
 
-.project-context {
+.item-context {
   margin-block: var(--spacing-small);
   font-size: 0.9em;
   font-style: italic;
@@ -382,7 +397,7 @@ dl {
     margin-bottom: var(--spacing-standard);
   }
 
-  .company {
+  .item-details {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -427,7 +442,7 @@ dl {
     display: none;
   }
 
-  .selected-work article,
+  .highlighted-items article,
   section:not(:has(> h2 + article ul)) article {
     break-inside: avoid;
   }
