@@ -78,6 +78,11 @@ body {
 header,
 main,
 footer {
+  max-width: 100ch;
+  width: 100%;
+}
+
+main {
   max-width: 72ch;
   width: 100%;
 }
@@ -103,8 +108,7 @@ header {
     margin: 0;
   }
 
-  nav,
-  address {
+  nav {
     text-align: right;
     font-style: normal;
 
@@ -114,6 +118,13 @@ header {
       display: flex;
       gap: var(--spacing-standard);
       list-style: none;
+
+      a[aria-current='page'] {
+        color: var(--heading-colour);
+        font-weight: 700;
+        text-decoration-thickness: 0.15em;
+        text-underline-offset: 0.25em;
+      }
     }
   }
 }
@@ -135,6 +146,7 @@ section {
 }
 
 footer {
+  text-align: center;
   padding-bottom: var(--spacing-large);
 }
 
