@@ -6,7 +6,7 @@ A lightweight, accessible online résumé for Jonathan Blades, a Senior Front-En
 
 My accessible online résumé, built with semantic HTML and modern CSS.
 
-[View my published résumé](https://bladeski.github.io/resume/)
+[View my published résumé](https://bladeski.github.io/)
 
 ## About
 
