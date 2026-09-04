@@ -26,13 +26,13 @@
 }
 
 @media (prefers-color-scheme: light) {
-  html:has(#theme-toggle:checked) {
+  html:has(#ThemeToggle:checked) {
     --bg: var(--color-dark-slate);
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  html:has(#theme-toggle:checked) {
+  html:has(#ThemeToggle:checked) {
     --bg: var(--color-white);
   }
 }
@@ -49,7 +49,7 @@ html {
   margin: 0;
   padding: 0;
   accent-color: var(--accent-colour);
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
@@ -72,8 +72,6 @@ body {
   letter-spacing: 0.12em;
 
   &:not(.js) {
-    padding: var(--spacing-standard);
-
     .js-only {
       display: none;
     }
@@ -89,6 +87,11 @@ footer {
 main {
   max-width: 72ch;
   width: 100%;
+
+  h2,
+  h3 {
+    scroll-margin-top: 5rem;
+  }
 }
 
 header,
@@ -314,6 +317,13 @@ button {
   border-bottom-left-radius: var(--spacing-standard);
   cursor: pointer;
 
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   @media (prefers-color-scheme: light) {
     &:active {
       --bg: var(--color-dark-slate);
@@ -389,7 +399,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-style: italic;
 }
 
@@ -438,13 +448,7 @@ button {
   background: var(--bg-contrast);
   color: var(--bg);
   border-bottom-right-radius: var(--spacing-standard);
-  opacity: 0.85;
   transition: opacity var(--default-transition);
-
-  &[open],
-  &:hover {
-    opacity: 1;
-  }
 
   summary {
     padding: var(--spacing-standard);
@@ -555,7 +559,10 @@ button {
   }
 
   .theme-toggle,
-  .skip-link {
+  .skip-link,
+  .share-button,
+  .t-o-c,
+  .site-title {
     display: none;
   }
 

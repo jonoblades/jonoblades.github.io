@@ -7,7 +7,7 @@
   <meta name="description" content="{{ page.description | default: site.description | escape }}">
   <meta property="og:title" content="{{ page.title | escape }}">
   <meta property="og:description" content="{{ page.description | default: site.description | escape }}">
-  <meta property="og:type" content="profile">
+  <meta property="og:type" content="{{ page.og_type | default: 'website' }}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
   <meta property="og:locale" content="en_GB">
   <link rel="canonical" href="{{ page.url | absolute_url }}">
@@ -36,13 +36,13 @@
         {% endif %}
       </span>
     </div>
-    <label id="ThemeToggle" class="theme-toggle" for="theme-toggle">
-      <input class="visually-hidden" type="checkbox" role="switch" id="theme-toggle" name="theme-toggle">
+    <label class="theme-toggle" for="ThemeToggle">
+      <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
       <span class="visually-hidden">Use opposite colour theme.</span>
     </label>
     <h1>{{ page.heading | default: page.title }}</h1>
 
-    <button id="ShareButton" class="share-button" aria-label="Share this page">
+    <button type="button" id="ShareButton" class="share-button" aria-label="Share this page">
       Share
     </button>
     {% include navigation.html %}
