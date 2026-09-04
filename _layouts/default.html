@@ -28,11 +28,13 @@
       <a class="site-title-link" href="{{ '/' | relative_url }}">
         Jonathan Blades
       </a>
-      {% if page.heading != 'Jonathan Blades' %}
       <span class="page-title">
+        {% if page.page_id == 'about' %}
+        About me
+        {% else %}
         {{ page.heading | default: page.title }}
+        {% endif %}
       </span>
-      {% endif %}
     </div>
     <label id="ThemeToggle" class="theme-toggle" for="theme-toggle">
       <input class="visually-hidden" type="checkbox" role="switch" id="theme-toggle" name="theme-toggle">

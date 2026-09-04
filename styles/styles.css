@@ -6,6 +6,7 @@
   --spacing-standard: 1rem;
   --spacing-large: 2rem;
   --spacing-xlarge: 4rem;
+  --default-transition: 0.3s ease;
 
   /* Color palette */
   --color-dark-slate: #090b10;
@@ -43,7 +44,6 @@
 }
 
 html {
-  color-scheme: light dark;
   height: 100%;
   width: 100%;
   margin: 0;
@@ -53,12 +53,16 @@ html {
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--text-colour);
-
+  width: 100%;
   margin: 0;
   padding: 0 var(--spacing-xlarge);
-
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: var(--bg);
+  color: var(--text-colour);
   font-family: var(--font-family);
   font-size: var(--font-size);
   font-optical-sizing: auto;
@@ -66,14 +70,6 @@ body {
   font-style: normal;
   line-height: 1.6;
   letter-spacing: 0.12em;
-
-  width: 100%;
-  overflow: auto;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
 
   &:not(.js) {
     padding: var(--spacing-standard);
@@ -97,17 +93,17 @@ main {
 
 header,
 section {
-  border-bottom: 2px solid var(--border-colour);
   padding-bottom: var(--spacing-standard);
   margin-bottom: var(--spacing-standard);
+  border-bottom: 2px solid var(--border-colour);
 }
 
 header {
   padding: var(--spacing-large) 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--spacing-standard);
 
   h1 {
@@ -123,8 +119,8 @@ header {
       padding: 0;
       display: flex;
       flex-wrap: wrap;
-      gap: var(--spacing-standard);
       list-style: none;
+      gap: var(--spacing-standard);
 
       a[aria-current='page'] {
         color: var(--heading-colour);
@@ -133,15 +129,6 @@ header {
         text-underline-offset: 0.25em;
       }
     }
-  }
-}
-
-header address {
-  width: 100%;
-  text-align: left;
-
-  ul {
-    justify-content: flex-start;
   }
 }
 
@@ -168,10 +155,10 @@ footer {
 h1,
 h2,
 h3 {
+  margin: var(--spacing-standard) 0 var(--spacing-small);
   font-family: var(--font-family);
   line-height: 1.2;
   color: var(--heading-colour);
-  margin: var(--spacing-standard) 0 var(--spacing-small);
 }
 
 h1 {
@@ -225,20 +212,20 @@ dl {
 }
 
 blockquote {
-  font-style: italic;
-  border-left: 2px solid var(--accent-colour);
   margin-left: var(--spacing-standard);
   padding-left: var(--spacing-standard);
+  border-left: 2px solid var(--accent-colour);
+  font-style: italic;
 }
 
 button {
-  cursor: pointer;
+  padding: var(--spacing-small) var(--spacing-standard);
+  background-color: transparent;
   font-family: var(--font-family);
   font-size: var(--font-size);
-  background-color: transparent;
   border: 1px solid;
   border-radius: var(--spacing-small);
-  padding: var(--spacing-small) var(--spacing-standard);
+  cursor: pointer;
 }
 
 :focus-visible {
@@ -253,8 +240,8 @@ button {
   left: 50%;
   z-index: 10;
   padding: var(--spacing-small) var(--spacing-standard);
-  color: var(--bg);
   background: var(--text-colour);
+  color: var(--bg);
   transform: translateY(-120%) translateX(-50%);
 }
 
@@ -270,18 +257,18 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  padding: 0;
-  background-color: var(--bg);
-  display: flex;
-  font-weight: 700;
   max-width: min-content;
+  padding: 0;
+  display: flex;
+  background-color: var(--bg);
+  font-weight: 700;
 
   >* {
     height: max-content;
-    writing-mode: sideways-lr;
     padding: var(--spacing-standard);
     display: flex;
     align-items: center;
+    writing-mode: sideways-lr;
     border: 1px solid var(--bg-contrast);
     border-left: none;
     border-bottom-right-radius: var(--spacing-standard);
@@ -292,11 +279,11 @@ button {
   }
 
   .site-title-link {
+    width: max-content;
     background-color: var(--bg-contrast);
     color: var(--bg);
     border-bottom-right-radius: var(--spacing-standard);
     text-decoration: none;
-    width: max-content;
     line-height: 1;
     font-size: 1.5rem;
   }
@@ -319,9 +306,9 @@ button {
   position: fixed;
   top: 0;
   right: 0;
+  padding: var(--spacing-standard);
   display: flex;
   align-items: center;
-  padding: var(--spacing-standard);
   background-color: var(--bg-contrast);
   color: var(--bg);
   border-bottom-left-radius: var(--spacing-standard);
@@ -358,17 +345,17 @@ button {
 
   &::before,
   &::after {
-    content: '';
-    display: flex;
     width: var(--spacing-small);
     height: calc(2 * var(--spacing-small));
+    display: flex;
     border: 1px solid var(--bg);
+    content: '';
   }
 
   &::before {
+    background-color: var(--bg);
     border-top-left-radius: var(--spacing-small);
     border-bottom-left-radius: var(--spacing-small);
-    background-color: var(--bg);
     border-right: none;
   }
 
@@ -384,12 +371,12 @@ button {
 }
 
 .specialisms {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-small);
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-wrap: wrap;
   list-style: none;
+  gap: var(--spacing-small);
 
   li+li {
     padding-inline-start: var(--spacing-small);
@@ -398,13 +385,12 @@ button {
 }
 
 .job-title {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 100%;
-
-  font-style: italic;
   font-size: 1.2em;
+  font-style: italic;
 }
 
 .item-details {
@@ -444,25 +430,36 @@ button {
 }
 
 .t-o-c {
+  position: sticky;
+  top: 0;
+  margin-top: calc(-1 * var(--spacing-standard));
   display: flex;
   flex-direction: column;
-  margin-top: calc(-1 * var(--spacing-standard));
-  padding: var(--spacing-standard);
-  transition: width 0.3s ease;
-
   background: var(--bg-contrast);
   color: var(--bg);
-
   border-bottom-right-radius: var(--spacing-standard);
+  opacity: 0.85;
+  transition: opacity var(--default-transition);
+
+  &[open],
+  &:hover {
+    opacity: 1;
+  }
+
+  summary {
+    padding: var(--spacing-standard);
+    cursor: pointer;
+  }
 
   ul {
-    flex: 1;
+    margin-top: 0;
+    padding: var(--spacing-standard) var(--spacing-large);
     display: flex;
+    flex: 1;
     flex-direction: column;
-    gap: var(--spacing-small);
     overflow: hidden;
     list-style: none;
-    padding: 0 var(--spacing-large);
+    gap: var(--spacing-small);
 
     li {
       max-width: 100%;
