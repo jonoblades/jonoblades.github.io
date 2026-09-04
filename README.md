@@ -6,7 +6,7 @@ A lightweight, accessible online résumé for Jonathan Blades, a Senior Front-En
 
 My accessible online résumé, built with semantic HTML and modern CSS.
 
-[View my published résumé](https://bladeski.github.io/)
+[View my published résumé](https://jonoblades.github.io/)
 
 ## About
 
@@ -40,7 +40,7 @@ The creation of reusable Angular components, shared implementation patterns and 
 
 A self-contained, CI-friendly npm command-line tool for identifying packages associated with known software supply-chain compromises.
 
-[View scan-compromised on GitHub](https://github.com/bladeski/scan-compromised)
+[View scan-compromised on GitHub](https://github.com/jonoblades/scan-compromised)
 
 ## Accessibility
 
