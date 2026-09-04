@@ -14,8 +14,8 @@
   --color-light-slate: #4a5568;
   --color-navy: #2c5282;
   --color-teal: #319795;
-  --color-white: #ffffff;
-  --color-black: #000000;
+  --color-white: #fdfcf9;
+  --color-black: #121212;
 
   --bg: light-dark(var(--color-white), var(--color-dark-slate));
   --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
