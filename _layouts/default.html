@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,36 +13,58 @@
   <link rel="canonical" href="{{ page.url | absolute_url }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link href="{{ '/styles.css' | relative_url }}" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <link href="{{ '/styles/styles.css' | relative_url }}" rel="stylesheet">
+  <script src="{{ '/scripts/index.js' | relative_url }}" type="module"></script>
   <title>{{ page.title }}</title>
 </head>
+
 <body>
   <header>
     <a class="skip-link" href="#main-content">Skip to main content</a>
-    <a class="site-title" href="{{ '/' | relative_url }}">
-      Jonathan Blades
-    </a>
-    <label class="theme-toggle" for="theme-toggle">
+    <div class="site-title">
+      <a class="site-title-link" href="{{ '/' | relative_url }}">
+        Jonathan Blades
+      </a>
+      {% if page.heading != 'Jonathan Blades' %}
+      <span class="page-title">
+        {{ page.heading | default: page.title }}
+      </span>
+      {% endif %}
+    </div>
+    <label id="ThemeToggle" class="theme-toggle" for="theme-toggle">
       <input class="visually-hidden" type="checkbox" role="switch" id="theme-toggle" name="theme-toggle">
       <span class="visually-hidden">Use opposite colour theme.</span>
     </label>
     <h1>{{ page.heading | default: page.title }}</h1>
+
+    <button id="ShareButton" class="share-button" aria-label="Share this page">
+      Share
+    </button>
     {% include navigation.html %}
     <div class="job-title">
       <span>{{ page.subtitle }}</span>
       {% if page.tags %}
-        <ul class="specialisms" aria-label="{{ page.tags_label | default: 'Specialisms' }}">
-          {% for item in page.tags %}
-            <li>{{ item }}</li>
-          {% endfor %}
-        </ul>
+      <ul class="specialisms" aria-label="{{ page.tags_label | default: 'Specialisms' }}">
+        {% for item in page.tags %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
       {% endif %}
     </div>
   </header>
   <main id="main-content">
+    <details class="t-o-c js-only">
+      <summary>Table of Contents</summary>
+      <nav aria-label="Table of Contents">
+        <ul id="TableOfContents"></ul>
+      </nav>
+    </details>
     {{ content }}
   </main>
   {% include footer.html %}
 </body>
+
 </html>
