@@ -49,7 +49,13 @@ html {
   margin: 0;
   padding: 0;
   accent-color: var(--accent-colour);
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
@@ -319,11 +325,6 @@ button {
   cursor: pointer;
 
 
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
-  }
 
   @media (prefers-color-scheme: light) {
     &:active {
@@ -395,7 +396,7 @@ button {
   }
 }
 
-.job-title {
+.subtitle {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -446,37 +447,57 @@ button {
   margin-top: calc(-1 * var(--spacing-standard));
   display: flex;
   flex-direction: column;
-  background: var(--bg-contrast);
   color: var(--bg);
+  overflow: hidden;
   border-bottom-right-radius: var(--spacing-standard);
-  transition: opacity var(--default-transition);
+  background: var(--bg-contrast);
 
-  summary {
-    padding: var(--spacing-standard);
-    cursor: pointer;
+  &::details-content {
+    opacity: 0;
+    max-height: 0;
+    transition: var(--default-transition);
   }
 
-  ul {
-    margin-top: 0;
-    padding: var(--spacing-standard) var(--spacing-large);
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: hidden;
-    list-style: none;
-    gap: var(--spacing-small);
-
-    li {
-      max-width: 100%;
-
-      &.sub-item {
-        padding-left: var(--spacing-standard);
-      }
+  &[open] {
+    &::details-content {
+      max-height: 500px;
+      opacity: 1;
     }
 
-    a {
-      color: var(--bg);
+    summary {
+      border-bottom-right-radius: 0;
     }
+  }
+}
+
+summary {
+  background: var(--bg-contrast);
+  padding: var(--spacing-standard);
+  border-bottom-right-radius: var(--spacing-standard);
+  cursor: pointer;
+  transition: var(--default-transition);
+}
+
+ul {
+  margin-top: 0;
+  padding: 0 var(--spacing-large);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  list-style: none;
+  gap: var(--spacing-small);
+
+  li {
+    max-width: 100%;
+
+    &.sub-item {
+      padding-left: var(--spacing-standard);
+    }
+  }
+
+  a {
+    color: var(--bg);
   }
 }
 
