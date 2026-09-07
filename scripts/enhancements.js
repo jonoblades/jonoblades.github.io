@@ -43,7 +43,12 @@ export default class Enhancements {
       if (titles.length > 0) {
         titles.forEach(title => {
           if (!title.id) {
-            title.id = title.textContent.toLowerCase().replace(/\s+/g, '-');
+            const usedIds = new Set();
+            title.id = this.#createHeadingId(
+              title.textContent,
+              usedIds
+            );
+            title.textContent.toLowerCase().replace(/\s+/g, '-');
           }
           const li = document.createElement('li');
           const link = document.createElement('a');
@@ -63,6 +68,28 @@ export default class Enhancements {
         });
       }
     }
+  }
+
+  #createHeadingId(text, usedIds) {
+    const baseId = text
+      .trim()
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'section';
+
+    let id = baseId;
+    let suffix = 2;
+
+    while (usedIds.has(id) || document.getElementById(id)) {
+      id = `${baseId}-${suffix}`;
+      suffix += 1;
+    }
+
+    usedIds.add(id);
+    return id;
   }
 
   #addShareButton() {

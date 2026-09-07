@@ -26,7 +26,7 @@ class SettingsService {
   }
 
   #addThemeToggleListener() {
-    const themeToggleCheckbox = document.getElementById('ThemeToggle').control;
+    const themeToggleCheckbox = document.getElementById('ThemeToggle');
     themeToggleCheckbox.addEventListener('change', (ev) => {
       this.theme = ev.currentTarget.checked ? 'other' : 'system';
     });
