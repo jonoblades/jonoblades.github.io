@@ -468,36 +468,36 @@ button {
       border-bottom-right-radius: 0;
     }
   }
-}
 
-summary {
-  background: var(--bg-contrast);
-  padding: var(--spacing-standard);
-  border-bottom-right-radius: var(--spacing-standard);
-  cursor: pointer;
-  transition: var(--default-transition);
-}
-
-ul {
-  margin-top: 0;
-  padding: 0 var(--spacing-large);
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow: hidden;
-  list-style: none;
-  gap: var(--spacing-small);
-
-  li {
-    max-width: 100%;
-
-    &.sub-item {
-      padding-left: var(--spacing-standard);
-    }
+  summary {
+    background: var(--bg-contrast);
+    padding: var(--spacing-standard);
+    border-bottom-right-radius: var(--spacing-standard);
+    cursor: pointer;
+    transition: var(--default-transition);
   }
 
-  a {
-    color: var(--bg);
+  ul {
+    margin-top: 0;
+    padding: 0 var(--spacing-large);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    list-style: none;
+    gap: var(--spacing-small);
+
+    li {
+      max-width: 100%;
+
+      &.sub-item {
+        padding-left: var(--spacing-standard);
+      }
+    }
+
+    a {
+      color: var(--bg);
+    }
   }
 }
 
