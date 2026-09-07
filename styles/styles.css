@@ -22,7 +22,7 @@
   --text-colour: var(--bg-contrast);
   --heading-colour: color-mix(in oklab, var(--color-navy) 55%, contrast-color(var(--bg)) 45%);
   --accent-colour: color-mix(in oklab, var(--color-teal) 70%, contrast-color(var(--bg)) 30%);
-  --border-colour: var(--color-light-slate);
+  --border-colour: var(--bg-contrast);
 }
 
 @media (prefers-color-scheme: light) {
@@ -226,7 +226,7 @@ button {
   background-color: transparent;
   font-family: var(--font-family);
   font-size: var(--font-size);
-  border: 1px solid;
+  border: 1px solid var(--border-colour);
   border-radius: var(--spacing-small);
   cursor: pointer;
 }
@@ -272,7 +272,7 @@ button {
     display: flex;
     align-items: center;
     writing-mode: sideways-lr;
-    border: 1px solid var(--bg-contrast);
+    border: 1px solid var(--border-colour);
     border-left: none;
     border-bottom-right-radius: var(--spacing-standard);
   }
