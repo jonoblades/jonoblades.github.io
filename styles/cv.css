@@ -1,0 +1,29 @@
+.no-cv-mode {
+  display: none;
+}
+
+h1 {
+  visibility: hidden;
+  position: relative;
+  font-size: 0;
+
+  &::before {
+    content: 'Jonathan Blades';
+    visibility: visible;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+  }
+}
+
+@media print {
+  body {
+    font-size: 10pt;
+  }
+
+  header {
+    padding-top: 0;
+  }
+
+  footer {
+    display: none;
+  }
+}
