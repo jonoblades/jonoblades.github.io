@@ -16,5 +16,10 @@
         Résumé
       </a>
     </li>
+    <li>
+      <a href="{{ '/games' | relative_url }}"{% if page.page_id == 'games' %} aria-current="page"{% endif %}>
+        Games
+      </a>
+    </li>
   </ul>
 </nav>

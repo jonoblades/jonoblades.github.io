@@ -19,6 +19,66 @@ async function loadWords(length = 5) {
   return response.json();
 }
 
+const DATAMUSE_POS = Object.freeze({
+  n: 'noun',
+  v: 'verb',
+  adj: 'adjective',
+  adv: 'adverb',
+  u: 'unknown',
+});
+
+async function fetchDefinitionFromDictionaryApi(word) {
+  const response = await fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
+    {
+      headers: {
+        Accept: 'application/json',
+      },
+    },
+  );
+
+  if (!response || !response.ok) return null;
+
+  const data = await response.json();
+  const meanings = data?.[0]?.meanings;
+  if (!meanings || meanings.length === 0) return null;
+
+  const results = [];
+  for (const meaning of meanings) {
+    const partOfSpeech = meaning.partOfSpeech;
+    const definition = meaning.definitions?.[0]?.definition;
+    if (partOfSpeech && definition) {
+      results.push({ partOfSpeech, definition });
+    }
+  }
+  return results.length > 0 ? results : null;
+}
+
+// Fallback used when dictionaryapi.dev is unreachable (it has had recurring outages).
+async function fetchDefinitionFromDatamuse(word) {
+  const response = await fetch(
+    `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=d&max=1`,
+  );
+
+  if (!response || !response.ok) return null;
+
+  const data = await response.json();
+  const defs = data?.[0]?.defs;
+  if (!defs || defs.length === 0) return null;
+
+  const results = [];
+  for (const entry of defs) {
+    const [abbr, ...rest] = entry.split('\t');
+    const definition = rest.join('\t').trim();
+    if (!definition) continue;
+    results.push({
+      partOfSpeech: DATAMUSE_POS[abbr] ?? abbr,
+      definition,
+    });
+  }
+  return results.length > 0 ? results : null;
+}
+
 async function fetchDefinition(word) {
   if (!word) return null;
 
@@ -27,34 +87,18 @@ async function fetchDefinition(word) {
     ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
   if (isLocalHost) {
-    return null;
+    // return null;
   }
 
   try {
-    const response = await fetch(
-      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    );
+    return await fetchDefinitionFromDatamuse(word);
+  } catch {
+    // fall through to fallback provider
+  }
 
-    if (!response || !response.ok) return null;
-
-    const data = await response.json();
-    const meanings = data?.[0]?.meanings;
-    if (!meanings || meanings.length === 0) return null;
-
-    const results = [];
-    for (const meaning of meanings) {
-      const partOfSpeech = meaning.partOfSpeech;
-      const definition = meaning.definitions?.[0]?.definition;
-      if (partOfSpeech && definition) {
-        results.push({ partOfSpeech, definition });
-      }
-    }
-    return results.length > 0 ? results : null;
+  try {
+    const result = await fetchDefinitionFromDictionaryApi(word);
+    if (result) return result;
   } catch {
     return null;
   }
@@ -522,16 +566,16 @@ class Wordley {
 
       let color;
       if (percent < 50) {
-        color = 'var(--color-success)';
+        color = 'var(--colour-success)';
       } else if (percent < 80) {
-        color = 'var(--color-warning)';
+        color = 'var(--colour-warning)';
       } else {
-        color = 'var(--color-danger)';
+        color = 'var(--colour-danger)';
       }
       this.#messageBox.style.setProperty('--timer-color', color);
     } else if (this.#messageBox) {
       this.#messageBox.style.setProperty('--timer-progress', '0%');
-      this.#messageBox.style.setProperty('--timer-color', 'var(--color-success)');
+      this.#messageBox.style.setProperty('--timer-color', 'var(--colour-success)');
     }
   }
 
@@ -739,21 +783,18 @@ class Wordley {
 
   async #displayDefinition(word, rowEl) {
     if (!rowEl) return;
-    const tooltip = rowEl.querySelector('.tooltip');
-    if (!tooltip) return;
 
     const definitions = await fetchDefinition(word);
     if (definitions && definitions.length > 0) {
       const htmlRowEl = rowEl;
       const tooltipId = `tooltip-${htmlRowEl.dataset.row}-${Date.now()}`;
-      tooltip.id = tooltipId;
+      
       rowEl.setAttribute('aria-describedby', tooltipId);
 
-      const html = definitions
-        .map((d) => `<strong>${d.partOfSpeech}:</strong> ${d.definition}`)
-        .join('<br>');
-      tooltip.innerHTML = html;
-
+      htmlRowEl.dataset.tooltip = definitions
+        .slice(0, 5)
+        .map((d) => `${d.partOfSpeech}: ${d.definition}`)
+        .join('\n\r');
       htmlRowEl.hidden = false;
       rowEl.setAttribute('aria-label', `Definition of ${word}`);
     }

@@ -9,18 +9,41 @@
   --default-transition: 0.3s ease;
 
   /* Color palette */
-  --color-dark-slate: #090b10;
-  --color-medium-slate: #2d3748;
-  --color-light-slate: #4a5568;
-  --color-navy: #2c5282;
-  --color-teal: #319795;
-  --color-white: #fdfcf9;
-  --color-black: #121212;
+  --colour-dark-slate: #090b10;
+  --colour-medium-slate: #2d3748;
+  --colour-light-slate: #4a5568;
+  --colour-navy: #2c5282;
+  --colour-teal: #319795;
+  --colour-white: #fdfcf9;
+  --colour-black: #121212;
 
-  --bg: light-dark(var(--color-white), var(--color-dark-slate));
-  --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
+  --bg: light-dark(var(--colour-white), var(--colour-dark-slate));
+  --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
   --text-colour: var(--bg-contrast);
-  --heading-colour: color-mix(in oklab, var(--color-navy) 55%, contrast-color(var(--bg)) 45%);
-  --accent-colour: color-mix(in oklab, var(--color-teal) 70%, contrast-color(var(--bg)) 30%);
+  --heading-colour: color-mix(in oklab, var(--colour-navy) 55%, contrast-color(var(--bg)) 45%);
+  --accent-colour: color-mix(in oklab, var(--colour-teal) 70%, contrast-color(var(--bg)) 30%);
   --border-colour: var(--bg-contrast);
+  
+  /* Semantic status colors, tinted with the main palette hues.
+     -bg is a bold fill for tiles; -wash is a subtle tint for message banners. */
+  --colour-info: var(--colour-navy);
+  --colour-info-border: color-mix(in oklab, var(--colour-info) 70%, var(--bg-contrast) 30%);
+  --colour-info-bg: color-mix(in oklab, var(--colour-info) 65%, transparent);
+  --colour-info-wash: color-mix(in oklab, var(--colour-info) 16%, transparent);
+  --colour-info-text: var(--colour-white);
+  --colour-success: color-mix(in oklab, var(--colour-teal) 60%, #22c55e 40%);
+  --colour-success-bg: color-mix(in oklab, var(--colour-success) 65%, transparent);
+  --colour-success-wash: color-mix(in oklab, var(--colour-success) 16%, transparent);
+  --colour-success-border: color-mix(in oklab, var(--colour-success) 70%, var(--bg-contrast) 30%);
+  --colour-success-text: var(--colour-white);
+  --colour-warning: color-mix(in oklab, var(--colour-light-slate) 40%, #eab308 60%);
+  --colour-warning-bg: color-mix(in oklab, var(--colour-warning) 65%, transparent);
+  --colour-warning-wash: color-mix(in oklab, var(--colour-warning) 16%, transparent);
+  --colour-warning-border: color-mix(in oklab, var(--colour-warning) 70%, var(--bg-contrast) 30%);
+  --colour-warning-text: var(--colour-white);
+  --colour-danger: color-mix(in oklab, var(--colour-medium-slate) 35%, #ef4444 65%);
+  --colour-danger-border: color-mix(in oklab, var(--colour-danger) 70%, var(--bg-contrast) 30%);
+  --colour-danger-bg: color-mix(in oklab, var(--colour-danger) 65%, transparent);
+  --colour-danger-wash: color-mix(in oklab, var(--colour-danger) 16%, transparent);
+  --colour-danger-text: var(--colour-white);
 }

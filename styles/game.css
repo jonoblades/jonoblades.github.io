@@ -41,30 +41,13 @@
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
   --guessCount: 5;
 
-  /* Semantic status colors */
-  --color-info: var(--color-navy);
-  --color-info-border: color-mix(in oklab, var(--color-info) 70%, var(--bg-contrast) 30%);
-  --color-info-bg: rgba(59, 130, 246, 0.12);
-  --color-success: #0e5728;
-  --color-success-bg: var(--color-success);
-  --color-success-border: color-mix(in oklab, var(--color-success) 70%, var(--bg-contrast) 30%);
-  --color-success-text: var(--colour-white);
-  --color-warning: #634b03;
-  --color-warning-bg: var(--color-warning);
-  --color-warning-border: color-mix(in oklab, var(--color-warning) 70%, var(--bg-contrast) 30%);
-  --color-warning-text: var(--colour-white);
-  --color-danger: #ef4444;
-  --color-danger-border: color-mix(in oklab, var(--color-danger) 70%, var(--bg-contrast) 30%);
-  --color-danger-bg: rgba(239, 68, 68, 0.12);
-  --color-danger-text: var(--colour-white);
-
-  --color-tile-bg: rgba(255, 255, 255, 0.03);
-  --color-tile-border: var(--border-colour);
-  --color-tile-border-filled: var(--border-colour);
-  --color-tile-text: var(--colour-white);
-  --color-absent-bg: var(--color-light-slate);
-  --color-absent-border: color-mix(in oklab, var(--color-light-slate) 70%, var(--bg-contrast) 30%);
-  --color-absent-text: var(--colour-white);
+  --colour-tile-bg: rgba(255, 255, 255, 0.03);
+  --colour-tile-border: var(--border-colour);
+  --colour-tile-border-filled: var(--border-colour);
+  --colour-tile-text: var(--bg-contrast);
+  --colour-absent-bg: var(--colour-light-slate);
+  --colour-absent-border: color-mix(in oklab, var(--colour-light-slate) 70%, var(--bg-contrast) 30%);
+  --colour-absent-text: var(--colour-white);
 }
 
 * {
@@ -180,15 +163,11 @@ dialog {
   letter-spacing: 0.01em;
   min-height: 20px;
   text-align: center;
-  max-width: calc(
-    var(--guessCount) * var(--tile-size) + (var(--guessCount) - 1) * var(--space-xs) + 2 *
-      var(--space-2xl)
-  );
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow: hidden;
   --timer-progress: 0%;
-  --timer-color: var(--color-success);
+  --timer-color: var(--colour-success);
 
   &::before {
     content: '';
@@ -222,26 +201,27 @@ dialog {
   }
 
   &.info {
-    border-color: var(--color-info-border);
-    background: var(--color-info-bg);
+    border-color: var(--colour-info-border);
+    background: var(--colour-info-bg);
+    color: var(--colour-info-text);
   }
 
   &.error {
-    border-color: var(--color-danger-border);
-    background: var(--color-danger-bg);
-    color: var(--color-danger-text);
+    border-color: var(--colour-danger-border);
+    background: var(--colour-danger-bg);
+    color: var(--colour-danger-text);
   }
 
   &.success {
-    border-color: var(--color-success-border);
-    background: var(--color-success-bg);
-    color: var(--color-success-text);
+    border-color: var(--colour-success-border);
+    background: var(--colour-success-bg);
+    color: var(--colour-success-text);
   }
 
   &.warning {
-    border-color: var(--color-warning-border);
-    background: var(--color-warning-bg);
-    color: var(--color-warning-text);
+    border-color: var(--colour-warning-border);
+    background: var(--colour-warning-bg);
+    color: var(--colour-warning-text);
   }
 }
 
@@ -252,21 +232,21 @@ dialog {
 }
 
 .correct {
-  background: var(--color-success-bg);
-  border-color: var(--color-success-border);
-  color: var(--color-success-text);
+  background: var(--colour-success-bg);
+  border-color: var(--colour-success-border);
+  color: var(--colour-success-text);
 }
 
 .present {
-  background: var(--color-warning-bg);
-  border-color: var(--color-warning-border);
-  color: var(--color-warning-text);
+  background: var(--colour-warning-bg);
+  border-color: var(--colour-warning-border);
+  color: var(--colour-warning-text);
 }
 
 .absent {
-  background: var(--color-absent-bg);
-  border-color: var(--color-absent-border);
-  color: var(--color-absent-text);
+  background: var(--colour-absent-bg);
+  border-color: var(--colour-absent-border);
+  color: var(--colour-absent-text);
   opacity: 0.55;
 }
 
@@ -372,75 +352,12 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  anchor-scope: --info-anchor;
-  anchor-name: --info-anchor;
 
   .tiles {
     display: grid;
     grid-template-columns: repeat(var(--guessCount), auto);
     gap: var(--space-xs);
     flex-shrink: 0;
-  }
-
-  .tooltip {
-    position: absolute;
-    position-anchor: --info-anchor;
-    position-area: bottom;
-    background: var(--bg-2);
-    border: var(--border-1) solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-sm) var(--space-md);
-    font-size: var(--font-sm);
-    color: var(--text);
-    white-space: normal;
-    width: max-content;
-    line-height: 1.5;
-    box-shadow: var(--shadow);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      opacity 200ms ease,
-      visibility 200ms ease;
-    z-index: 100;
-    text-align: left;
-    max-width: calc(6 * var(--tile-size));
-
-    &:empty {
-      display: none;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 6px solid transparent;
-      border-right-color: var(--border);
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 5px solid transparent;
-      border-right-color: var(--bg-2);
-      margin-right: -1px;
-    }
-
-    strong {
-      color: var(--accent);
-      font-weight: 600;
-    }
-  }
-
-  &:hover .tooltip,
-  &:focus .tooltip {
-    opacity: 1;
-    visibility: visible;
   }
 }
 
@@ -519,12 +436,10 @@ select {
   margin: 0;
 
   /* CSS custom properties for game-tile component */
-  --color-tile-bg: rgba(255, 255, 255, 0.03);
-  --color-tile-border: var(--border-colour);
-  --color-tile-border-filled: var(--border-colour);
-  --color-tile-text: var(--colour-white);
-  --color-focus: var(--accent-colour);
-  --color-focus-ring: rgba(249, 115, 22, 0.25);
+  --colour-tile-border: var(--border-colour);
+  --colour-tile-border-filled: var(--border-colour);
+  --colour-focus: var(--accent-colour);
+  --colour-focus-ring: rgba(249, 115, 22, 0.25);
 
   game-tile {
     --tile-font-size: var(--font-2xl);
@@ -556,82 +471,22 @@ select {
   margin-top: var(--space-md);
 }
 
-#submitGuess {
-  padding: 0 var(--space-xl);
-  border-radius: var(--radius-md);
-  border: var(--border-1) solid var(--accent-colour);
-  background: linear-gradient(135deg, var(--accent-colour) 0%, var(--accent-strong) 100%);
-  color: #0b1120;
-  font-weight: 700;
-  font-size: var(--font-md);
-  font-family: var(--font-family);
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition:
-    transform 120ms ease,
-    box-shadow 160ms ease,
-    filter 160ms ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 30px var(--color-info-bg);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 8px 18px var(--color-info-bg);
-  }
-
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-}
-
-#resetGame {
-  padding: 0 var(--space-lg);
-  border-radius: var(--radius-md);
-  border: var(--border-1) solid var(--border-colour);
-  background: transparent;
-  color: var(--colour-white);
-  font-weight: 600;
-  font-size: var(--font-md);
-  font-family: var(--font-family);
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  transition:
-    transform 120ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  }
-}
-
 .correct {
-  background: var(--color-success-bg);
-  border-color: var(--color-success-border);
-  color: var(--color-success-text);
+  background: var(--colour-success-bg);
+  border-color: var(--colour-success-border);
+  color: var(--colour-success-text);
 }
 
 .present {
-  background: var(--color-warning-bg);
-  border-color: var(--color-warning-border);
-  color: var(--color-warning-text);
+  background: var(--colour-warning-bg);
+  border-color: var(--colour-warning-border);
+  color: var(--colour-warning-text);
 }
 
 .absent {
-  background: var(--color-absent-bg);
-  border-color: var(--color-absent-border);
-  color: var(--color-absent-text);
+  background: var(--colour-absent-bg);
+  border-color: var(--colour-absent-border);
+  color: var(--colour-absent-text);
   opacity: 0.55;
 }
 
@@ -657,31 +512,5 @@ select {
 
   h1 {
     font-size: var(--font-xl);
-  }
-
-  .row .tooltip {
-    position-anchor: --info-anchor;
-    inset: unset;
-    top: anchor(bottom);
-    left: anchor(center);
-    right: auto;
-    transform: translateX(-50%);
-    margin-top: var(--space-xs);
-    margin-left: 0;
-    max-width: 14rem;
-
-    &::before,
-    &::after {
-      display: none;
-    }
-  }
-
-  @supports not (position-anchor: --info-anchor) {
-    .row .tooltip {
-      left: auto;
-      right: 0;
-      top: calc(100% + var(--space-xs));
-      transform: none;
-    }
   }
 }

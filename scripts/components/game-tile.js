@@ -6,7 +6,7 @@
 
 class GameTile extends HTMLElement {
   static get observedAttributes() {
-    return ['value', 'readonly', 'type', 'status', 'index', 'disabled', 'placeholder', 'selected'];
+    return ['value', 'name', 'label', 'role', 'readonly', 'type', 'status', 'index', 'disabled', 'placeholder', 'selected'];
   }
 
   constructor() {
@@ -18,6 +18,8 @@ class GameTile extends HTMLElement {
   #render() {
     const isReadonly = this.hasAttribute('readonly');
     const value = this.getAttribute('value') || '';
+    const name = this.getAttribute('name') || '';
+    const label = this.getAttribute('label') || 'Tile';
     const type = this.getAttribute('type') || 'letter';
     const disabled = this.hasAttribute('disabled');
     const placeholder = this.getAttribute('placeholder') || '';
@@ -33,32 +35,32 @@ class GameTile extends HTMLElement {
           --tile-size: calc(4rem * var(--tile-scale));
           --tile-border-radius: calc(var(--radius-sm, 0.25rem) * var(--tile-scale));
           --tile-border-width: var(--border-sm, 2px);
-          --tile-bg: var(--color-tile-bg, #ffffff);
+          --tile-bg: var(--colour-tile-bg, #ffffff);
           --tile-border: var(--border-colour, #d3d6da);
-          --tile-text: var(--color-tile-text, #1a1a1b);
+          --tile-text: var(--colour-tile-text, #1a1a1b);
         }
 
         :host([status="correct"]), :host([status="success"]), :host([status="green"]) {
-          --tile-bg: var(--color-success-bg, rgba(34, 197, 94, 0.18));
-          --tile-border: var(--color-success-border, rgba(34, 197, 94, 0.55));
-          --tile-text: var(--color-success-text, #dcfce7);
+          --tile-bg: var(--colour-success-bg, rgba(34, 197, 94, 0.18));
+          --tile-border: var(--colour-success-border, rgba(34, 197, 94, 0.55));
+          --tile-text: var(--colour-success-text, #dcfce7);
         }
 
         :host([status="present"]), :host([status="warning"]), :host([status="yellow"]) {
-          --tile-bg: var(--color-warning-bg, rgba(234, 179, 8, 0.18));
-          --tile-border: var(--color-warning-border, rgba(234, 179, 8, 0.55));
-          --tile-text: var(--color-warning-text, #fef9c3);
+          --tile-bg: var(--colour-warning-bg, rgba(234, 179, 8, 0.18));
+          --tile-border: var(--colour-warning-border, rgba(234, 179, 8, 0.55));
+          --tile-text: var(--colour-warning-text, #fef9c3);
         }
 
         :host([status="absent"]) {
-          --tile-bg: var(--color-absent-bg, rgba(71, 85, 105, 0.3));
-          --tile-border: var(--color-absent-border, rgba(71, 85, 105, 0.7));
-          --tile-text: var(--color-absent-text, #cbd5e1);
+          --tile-bg: var(--colour-absent-bg, rgba(71, 85, 105, 0.3));
+          --tile-border: var(--colour-absent-border, rgba(71, 85, 105, 0.7));
+          --tile-text: var(--colour-absent-text, #cbd5e1);
         }
 
         :host([selected]) {
           --tile-border: var(--accent, #4a90d9);
-          --color-tile-border-filled: var(--accent, #4a90d9);
+          --colour-tile-border-filled: var(--accent, #4a90d9);
         }
 
         :host([disabled]) {
@@ -67,15 +69,15 @@ class GameTile extends HTMLElement {
         }
 
         :host([status="info"]), :host([status="blue"]) {
-          --tile-bg: var(--color-info-bg, rgba(59, 130, 246, 0.18));
-          --tile-border: var(--color-info-border, rgba(59, 130, 246, 0.55));
-          --tile-text: var(--color-info-text, #dbeafe);
+          --tile-bg: var(--colour-info-bg, rgba(59, 130, 246, 0.18));
+          --tile-border: var(--colour-info-border, rgba(59, 130, 246, 0.55));
+          --tile-text: var(--colour-info-text, #dbeafe);
         }
 
         :host([status="error"]), :host([status="danger"]), :host([status="red"]) {
-          --tile-bg: var(--color-error-bg, rgba(239, 68, 68, 0.18));
-          --tile-border: var(--color-error-border, rgba(239, 68, 68, 0.55));
-          --tile-text: var(--color-error-text, #fee2e2);
+          --tile-bg: var(--colour-error-bg, rgba(239, 68, 68, 0.18));
+          --tile-border: var(--colour-error-border, rgba(239, 68, 68, 0.55));
+          --tile-text: var(--colour-error-text, #fee2e2);
         }
 
         .tile {
@@ -99,20 +101,20 @@ class GameTile extends HTMLElement {
         }
 
         .tile.filled {
-          border-color: var(--color-tile-border-filled, #878a8c);
+          border-color: var(--colour-tile-border-filled, #878a8c);
         }
 
         input.tile {
           text-align: center;
           caret-color: transparent;
-          outline: none;
           cursor: pointer;
         }
 
-        input.tile:focus {
-          border-color: var(--color-focus, #4a90d9);
-          box-shadow: 0 0 0 2px var(--color-focus-ring, rgba(74, 144, 217, 0.3));
-          transform: scale(1.05);
+        input.tile:focus,
+        input.tile:focus-visible {
+          outline: 3px solid var(--accent-colour);
+          outline-offset: 4px;
+          border-radius: var(--spacing-small);
         }
 
         input.tile::selection {
@@ -120,19 +122,20 @@ class GameTile extends HTMLElement {
         }
 
         input.tile::placeholder {
-          color: var(--color-correct, #22c55e);
-          opacity: 0.6;
+          color: var(--colour-success, #22c55e);
+          opacity: 0.8;
           font-weight: bold;
         }
       </style>
       ${isReadonly
-        ? `<div class="tile${value ? ' filled' : ''}" data-tooltip="${value ? value + ' ' : ''}${this.status ? this.status : ''}" part="tile" aria-label="Tile ${value ? value + ' ' : ''}${this.status ? this.status : ''}">${value}</div>`
+        ? `<div class="tile${value ? ' filled' : ''}" data-tooltip="${value ? value + ' ' : ''}${this.status ? this.status : ''}" part="tile" ${this.status ? this.status : ''}">${value}</div>`
         : `<input 
             class="tile${value ? ' filled' : ''}" 
             part="tile"
             type="text"
             maxlength="1"
             value="${value}"
+            name="${name}"
             placeholder="${placeholder}"
             ${disabled ? 'disabled' : ''}
             autocomplete="off"
@@ -140,7 +143,7 @@ class GameTile extends HTMLElement {
             spellcheck="false"
             inputmode="${type === 'number' ? 'numeric' : 'text'}"
             pattern="${type === 'number' ? '[0-9]' : '[a-zA-Z]'}"
-            aria-label="Tile ${value ? value + ' ' : ''}${this.status ? this.status : ''}"
+            aria-label="Tile ${label}"
           />`
       }
     `;
@@ -262,6 +265,18 @@ class GameTile extends HTMLElement {
 
   set value(val) {
     this.setAttribute('value', val || '');
+  }
+
+  get name() {
+    return this.getAttribute('name') || '';
+  }
+
+  set name(val) {
+    if (val) {
+      this.setAttribute('name', val);
+    } else {
+      this.removeAttribute('name');
+    }
   }
 
   get placeholder() {

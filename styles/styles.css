@@ -2,13 +2,13 @@
 
 @media (prefers-color-scheme: light) {
   html:has(#ThemeToggle:checked) {
-    --bg: var(--color-dark-slate);
+    --bg: var(--colour-dark-slate);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   html:has(#ThemeToggle:checked) {
-    --bg: var(--color-white);
+    --bg: var(--colour-white);
   }
 }
 
@@ -245,6 +245,7 @@ button {
   anchor-scope: all;
 
   &::after {
+    z-index: 1;
     content: attr(data-tooltip);
     position: fixed;
     position-anchor: --tooltip-anchor;
@@ -253,7 +254,7 @@ button {
     font-size: 0.8rem;
     padding: var(--spacing-small);
     border-radius: var(--spacing-small);
-    white-space: nowrap;
+    white-space: pre-wrap;
     opacity: 0;
     transition: opacity 0.3s;
     position-area: bottom;
@@ -261,6 +262,8 @@ button {
       bottom, bottom left, left, top left, top, top right, right, bottom right;
     margin: var(--spacing-small);
     pointer-events: none;
+    max-height: calc(8 * var(--tile-size));
+    overflow: hidden;
   }
 
   &:hover::after {
@@ -363,24 +366,24 @@ button {
 
   @media (prefers-color-scheme: light) {
     &:active {
-      --bg: var(--color-dark-slate);
-      --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
+      --bg: var(--colour-dark-slate);
+      --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
 
       &:has(input:checked) {
-        --bg: var(--color-white);
-        --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
+        --bg: var(--colour-white);
+        --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
       }
     }
   }
 
   @media (prefers-color-scheme: dark) {
     &:active {
-      --bg: var(--color-white);
-      --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
+      --bg: var(--colour-white);
+      --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
 
       &:has(input:checked) {
-        --bg: var(--color-dark-slate);
-        --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
+        --bg: var(--colour-dark-slate);
+        --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
       }
     }
   }
