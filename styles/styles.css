@@ -1,29 +1,4 @@
-:root {
-  --font-family: 'Inter', sans-serif;
-  --font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
-
-  --spacing-small: 0.5rem;
-  --spacing-standard: 1rem;
-  --spacing-large: 2rem;
-  --spacing-xlarge: 4rem;
-  --default-transition: 0.3s ease;
-
-  /* Color palette */
-  --color-dark-slate: #090b10;
-  --color-medium-slate: #2d3748;
-  --color-light-slate: #4a5568;
-  --color-navy: #2c5282;
-  --color-teal: #319795;
-  --color-white: #fdfcf9;
-  --color-black: #121212;
-
-  --bg: light-dark(var(--color-white), var(--color-dark-slate));
-  --bg-contrast: color-mix(in oklab, var(--color-light-slate) 40%, contrast-color(var(--bg)) 60%);
-  --text-colour: var(--bg-contrast);
-  --heading-colour: color-mix(in oklab, var(--color-navy) 55%, contrast-color(var(--bg)) 45%);
-  --accent-colour: color-mix(in oklab, var(--color-teal) 70%, contrast-color(var(--bg)) 30%);
-  --border-colour: var(--bg-contrast);
-}
+@import url('vars.css');
 
 @media (prefers-color-scheme: light) {
   html:has(#ThemeToggle:checked) {
@@ -290,6 +265,22 @@ button {
 
   &:hover::after {
     opacity: 1;
+  }
+}
+
+/* Fallback for browsers without anchor positioning */
+@supports not(position-anchor: --info-anchor) {
+  [data-tooltip]::after {
+    right: 0;
+    left: auto;
+    top: calc(100% + var(--spacing-small));
+    transform: none;
+    margin: 0;
+
+    &::before,
+    &::after {
+      display: none;
+    }
   }
 }
 

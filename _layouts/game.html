@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ page.description | default: site.description | escape }}">
+  <meta property="og:title" content="{{ page.title | escape }}">
+  <meta property="og:description" content="{{ page.description | default: site.description | escape }}">
+  <meta property="og:type" content="{{ page.og_type | default: 'website' }}">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="og:locale" content="en_GB">
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <link href="{{ '/styles/styles.css' | relative_url }}" rel="stylesheet">
+  <link href="{{ '/styles/game.css' | relative_url }}" rel="stylesheet">
+  <title>{{ page.title }}</title>
+</head>
+
+<body>
+  <header>
+    <a class="skip-link no-print" href="#main-content">Skip to main content</a>
+    <div class="site-title no-print">
+      <a class="site-title-link" href="{{ '/' | relative_url }}">
+        Jonathan Blades
+      </a>
+      <span class="page-title">
+        {% if page.page_id == 'about' %}
+        About me
+        {% else %}
+        {{ page.heading | default: page.title }}
+        {% endif %}
+      </span>
+    </div>
+    <div class="theme-toggle no-print" data-tooltip="Toggle theme">
+      <label for="ThemeToggle">
+        <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
+        <span class="visually-hidden">Use opposite colour theme.</span>
+      </label>
+    </div>
+    <h1>{{ page.heading | default: page.title }}</h1>
+
+    <button data-tooltip="Share this page" type="button" id="ShareButton" class="share-button no-print" aria-label="Share this page">
+      Share
+    </button>
+    <a href="/games">Back to games</a>
+  </header>
+  <main id="main-content">
+    {{ content }}
+  </main>
+  {% include game-footer.html %}
+  <script src="{{ '/scripts/components/game-tile.js' | relative_url }}"></script>
+</body>
+</html>
