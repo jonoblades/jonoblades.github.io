@@ -36,13 +36,15 @@
         {% endif %}
       </span>
     </div>
-    <label class="theme-toggle no-print" for="ThemeToggle">
-      <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
-      <span class="visually-hidden">Use opposite colour theme.</span>
-    </label>
+    <div class="theme-toggle no-print" data-tooltip="Toggle theme">
+      <label for="ThemeToggle">
+        <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
+        <span class="visually-hidden">Use opposite colour theme.</span>
+      </label>
+    </div>
     <h1>{{ page.heading | default: page.title }}</h1>
 
-    <button type="button" id="ShareButton" class="share-button no-print" aria-label="Share this page">
+    <button data-tooltip="Share this page" type="button" id="ShareButton" class="share-button no-print" aria-label="Share this page">
       Share
     </button>
     {% include navigation.html %}

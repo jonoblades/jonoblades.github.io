@@ -230,17 +230,67 @@ blockquote {
 button {
   padding: var(--spacing-small) var(--spacing-standard);
   background-color: transparent;
+  color: var(--text-colour);
   font-family: var(--font-family);
   font-size: var(--font-size);
   border: 1px solid var(--border-colour);
   border-radius: var(--spacing-small);
   cursor: pointer;
+  transition: border-color var(--default-transition), color var(--default-transition);
+
+  &:hover {
+    border-color: var(--accent-colour);
+    color: var(--accent-colour);
+  }
+
+  &:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
 }
 
 :focus-visible {
   outline: 3px solid var(--accent-colour);
   outline-offset: 4px;
   border-radius: var(--spacing-small);
+}
+
+[data-tooltip] {
+  anchor-name: --tooltip-anchor;
+  anchor-scope: all;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: fixed;
+    position-anchor: --tooltip-anchor;
+    background-color: var(--bg-contrast);
+    color: var(--bg);
+    font-size: 0.8rem;
+    padding: var(--spacing-small);
+    border-radius: var(--spacing-small);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    position-area: bottom;
+    position-try-fallbacks:
+      bottom, bottom left, left, top left, top, top right, right, bottom right;
+    margin: var(--spacing-small);
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
 }
 
 .skip-link {
@@ -316,15 +366,9 @@ button {
   position: fixed;
   top: 0;
   right: 0;
-  padding: var(--spacing-standard);
-  display: flex;
-  align-items: center;
   background-color: var(--bg-contrast);
   color: var(--bg);
   border-bottom-left-radius: var(--spacing-standard);
-  cursor: pointer;
-
-
 
   @media (prefers-color-scheme: light) {
     &:active {
@@ -355,26 +399,34 @@ button {
     outline-offset: 4px;
   }
 
-  &::before,
-  &::after {
-    width: var(--spacing-small);
-    height: calc(2 * var(--spacing-small));
+  label {
+
+    padding: var(--spacing-standard);
     display: flex;
-    border: 1px solid var(--bg);
-    content: '';
-  }
+    align-items: center;
+    cursor: pointer;
 
-  &::before {
-    background-color: var(--bg);
-    border-top-left-radius: var(--spacing-small);
-    border-bottom-left-radius: var(--spacing-small);
-    border-right: none;
-  }
+    &::before,
+    &::after {
+      width: var(--spacing-small);
+      height: calc(2 * var(--spacing-small));
+      display: flex;
+      border: 1px solid var(--bg);
+      content: '';
+    }
 
-  &::after {
-    border-top-right-radius: var(--spacing-small);
-    border-bottom-right-radius: var(--spacing-small);
-    border-left: none;
+    &::before {
+      background-color: var(--bg);
+      border-top-left-radius: var(--spacing-small);
+      border-bottom-left-radius: var(--spacing-small);
+      border-right: none;
+    }
+
+    &::after {
+      border-top-right-radius: var(--spacing-small);
+      border-bottom-right-radius: var(--spacing-small);
+      border-left: none;
+    }
   }
 }
 
