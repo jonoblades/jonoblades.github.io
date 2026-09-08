@@ -181,7 +181,7 @@ class Wordley {
     this.#letterInputs = Array.from(document.querySelectorAll('.guess-letter'));
     this.#lengthValue = document.getElementById('lengthValue');
     this.#settingsDialog = document.getElementById('settingsDialog');
-    this.#settingsBtn = document.getElementById('settingsBtn');
+    this.#settingsBtn = document.getElementById('SettingsButton');
     this.#closeSettingsBtn = document.getElementById('closeSettings');
     this.#timerSelect = document.getElementById('timerSelect');
     this.#playerCountInputs = document.querySelectorAll('input[name="playerCount"]');

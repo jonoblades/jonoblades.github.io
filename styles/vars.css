@@ -28,22 +28,22 @@
      -bg is a bold fill for tiles; -wash is a subtle tint for message banners. */
   --colour-info: var(--colour-navy);
   --colour-info-border: color-mix(in oklab, var(--colour-info) 70%, var(--bg-contrast) 30%);
-  --colour-info-bg: color-mix(in oklab, var(--colour-info) 65%, transparent);
+  --colour-info-bg: color-mix(in oklab, var(--colour-info) 80%, transparent);
   --colour-info-wash: color-mix(in oklab, var(--colour-info) 16%, transparent);
   --colour-info-text: var(--colour-white);
   --colour-success: color-mix(in oklab, var(--colour-teal) 60%, #22c55e 40%);
-  --colour-success-bg: color-mix(in oklab, var(--colour-success) 65%, transparent);
+  --colour-success-bg: color-mix(in oklab, var(--colour-success) 80%, transparent);
   --colour-success-wash: color-mix(in oklab, var(--colour-success) 16%, transparent);
   --colour-success-border: color-mix(in oklab, var(--colour-success) 70%, var(--bg-contrast) 30%);
   --colour-success-text: var(--colour-white);
   --colour-warning: color-mix(in oklab, var(--colour-light-slate) 40%, #eab308 60%);
-  --colour-warning-bg: color-mix(in oklab, var(--colour-warning) 65%, transparent);
+  --colour-warning-bg: color-mix(in oklab, var(--colour-warning) 80%, transparent);
   --colour-warning-wash: color-mix(in oklab, var(--colour-warning) 16%, transparent);
   --colour-warning-border: color-mix(in oklab, var(--colour-warning) 70%, var(--bg-contrast) 30%);
   --colour-warning-text: var(--colour-white);
   --colour-danger: color-mix(in oklab, var(--colour-medium-slate) 35%, #ef4444 65%);
   --colour-danger-border: color-mix(in oklab, var(--colour-danger) 70%, var(--bg-contrast) 30%);
-  --colour-danger-bg: color-mix(in oklab, var(--colour-danger) 65%, transparent);
+  --colour-danger-bg: color-mix(in oklab, var(--colour-danger) 80%, transparent);
   --colour-danger-wash: color-mix(in oklab, var(--colour-danger) 16%, transparent);
   --colour-danger-text: var(--colour-white);
 }

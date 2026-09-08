@@ -43,11 +43,16 @@
       </label>
     </div>
     <h1>{{ page.heading | default: page.title }}</h1>
-
-    <button data-tooltip="Share this page" type="button" id="ShareButton" class="share-button no-print" aria-label="Share this page">
+    <button data-tooltip="Share this page" type="button" id="ShareButton" class="share-button no-print"
+      aria-label="Share this page">
       Share
     </button>
     <a href="/games">Back to games</a>
+    <div class="spacer"></div>
+    <button id="SettingsButton" type="button" data-tooltip="Settings" class="settings-button no-print"
+      aria-label="Settings">
+      ⚙
+    </button>
   </header>
   <main id="main-content">
     {{ content }}
@@ -55,4 +60,5 @@
   {% include game-footer.html %}
   <script src="{{ '/scripts/components/game-tile.js' | relative_url }}"></script>
 </body>
+
 </html>

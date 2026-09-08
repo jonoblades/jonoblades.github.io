@@ -33,6 +33,21 @@ html {
   }
 }
 
+body,
+input,
+select,
+option,
+button {
+  font-family: var(--font-family, 'Inter', sans-serif);
+  font-size: var(--font-size, 1rem);
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  color: var(--text-colour, inherit);
+}
+
 body {
   width: 100%;
   margin: 0;
@@ -43,14 +58,6 @@ body {
   align-items: center;
   justify-content: flex-start;
   background-color: var(--bg);
-  color: var(--text-colour);
-  font-family: var(--font-family);
-  font-size: var(--font-size);
-  font-optical-sizing: auto;
-  font-weight: 300;
-  font-style: normal;
-  line-height: 1.6;
-  letter-spacing: 0.12em;
 
   &:not(.js) {
     .js-only {
@@ -221,6 +228,10 @@ button {
   &:active {
     transform: none;
   }
+
+  &.icon-btn {
+    letter-spacing: normal;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -231,6 +242,42 @@ button {
     &:active {
       transform: none;
     }
+  }
+}
+
+dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0;
+  min-width: 280px;
+  max-width: 90vw;
+  border: var(--border-1) solid var(--border-colour);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  color: var(--bg-contrast);
+  box-shadow: var(--shadow);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  &[open] {
+    animation: dialogFadeIn 0.2s ease-out;
+  }
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
