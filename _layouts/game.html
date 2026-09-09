@@ -18,6 +18,11 @@
     rel="stylesheet">
   <link href="{{ '/styles/styles.css' | relative_url }}" rel="stylesheet">
   <link href="{{ '/styles/game.css' | relative_url }}" rel="stylesheet">
+  {% if page.styles %}
+  {% for style in page.styles %}
+  <link href="{{ style }}" rel="stylesheet">
+  {% endfor %}
+  {% endif %}
   <title>{{ page.title }}</title>
 </head>
 

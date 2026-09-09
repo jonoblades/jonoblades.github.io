@@ -17,6 +17,11 @@
     href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
     rel="stylesheet">
   <link href="{{ '/styles/styles.css' | relative_url }}" rel="stylesheet">
+  {% if page.styles %}
+  {% for style in page.styles %}
+  <link href="{{ style | relative_url }}" rel="stylesheet">
+  {% endfor %}
+  {% endif %}
   <script src="{{ '/scripts/index.js' | relative_url }}" type="module"></script>
   <title>{{ page.title }}</title>
 </head>

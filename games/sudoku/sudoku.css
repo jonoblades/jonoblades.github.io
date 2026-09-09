@@ -1,0 +1,41 @@
+.sudoku-puzzle-number,
+.sudoku-puzzle-difficulty {
+  margin-right: var(--spacing-small);
+}
+
+.sudoku-grid {
+  margin: 0 auto;
+  display: grid;
+  width: min-content;
+  grid-template-columns: repeat(9, auto);
+  grid-template-rows: repeat(9, auto);
+  gap: var(--spacing-standard);
+  column-rule: repeat(auto, none, none, 2px solid var(--border-colour));
+  row-rule: repeat(auto, none, none, 2px solid var(--border-colour));
+
+  .cell {
+    &:nth-child(3n) {
+      margin-right: var(--spacing-small);
+    }
+
+    &:nth-child(3n + 1) {
+      margin-left: var(--spacing-small);
+    }
+
+    &:nth-child(n+19):nth-child(-n+27),
+    &:nth-child(n+46):nth-child(-n+54) {
+      margin-bottom: var(--spacing-small);
+    }
+
+    &:nth-child(n+28):nth-child(-n+36),
+    &:nth-child(n+55):nth-child(-n+63) {
+      margin-top: var(--spacing-small);
+    }
+  }
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

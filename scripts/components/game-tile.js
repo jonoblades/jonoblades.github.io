@@ -75,9 +75,9 @@ class GameTile extends HTMLElement {
         }
 
         :host([status="error"]), :host([status="danger"]), :host([status="red"]) {
-          --tile-bg: var(--colour-error-bg, rgba(239, 68, 68, 0.18));
-          --tile-border: var(--colour-error-border, rgba(239, 68, 68, 0.55));
-          --tile-text: var(--colour-error-text, #fee2e2);
+          --tile-bg: var(--colour-danger-bg, rgba(239, 68, 68, 0.18));
+          --tile-border: var(--colour-danger-border, rgba(239, 68, 68, 0.55));
+          --tile-text: var(--colour-danger-text, #fee2e2);
         }
 
         .tile {

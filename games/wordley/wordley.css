@@ -1,0 +1,260 @@
+
+body {
+  &:has(#lengthSelect[data-length='4']) {
+    --guessCount: 4;
+
+    .letter5,
+    .letter6 {
+      display: none;
+    }
+  }
+
+  &:has(#lengthSelect[data-length='5']) {
+    --guessCount: 5;
+
+    .letter6 {
+      display: none;
+    }
+  }
+
+  &:has(#lengthSelect[data-length='6']) {
+    --guessCount: 6;
+  }
+}
+
+.board-shell {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: var(--space-lg);
+}
+
+.board-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-small);
+  align-items: stretch;
+  z-index: 1;
+}
+
+#board {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-small);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  border: var(--border-1) solid var(--border);
+  backdrop-filter: blur(6px);
+
+  .player-1::before,
+  .player-2::before,
+  .player-1::after,
+  .player-2::after {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 0.35rem solid transparent;
+    border-bottom: 0.35rem solid transparent;
+    border-left: 0.45rem solid transparent;
+    border-right: 0.45rem solid transparent;
+  }
+
+  .player-1::before {
+    left: -1rem;
+    border-left: 0.45rem solid var(--accent);
+  }
+
+  .player-2::after {
+    right: -1rem;
+    border-right: 0.45rem solid var(--accent-secondary);
+  }
+}
+
+.alpha-col {
+  display: grid;
+  grid-template-rows: repeat(13, 1fr);
+  gap: var(--spacing-small);
+  justify-content: center;
+
+  game-tile.alpha-tile {
+    --tile-size: 100%;
+    --tile-font-size: var(--font-base);
+    --tile-border-radius: calc(var(--radius) / 3 * 2);
+    --tile-border-width: var(--border-2);
+
+    aspect-ratio: 1 / 1;
+  }
+}
+
+/* Styling for game-tile web component in board rows */
+.tiles game-tile {
+  --tile-font-size: var(--font-2xl);
+  --tile-border-radius: var(--radius);
+  --tile-border-width: var(--border-2);
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(var(--guessCount), auto);
+    gap: var(--spacing-small);
+    flex-shrink: 0;
+  }
+}
+
+#guessForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-2xl);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: var(--border-1) solid var(--border);
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: var(--space-sm);
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-right: 2px solid var(--border-colour);
+    border-bottom: 2px solid var(--border-colour);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover::after {
+    border-color: var(--accent-colour);
+  }
+
+  &:has(select:open)::after {
+    transform: translateY(-30%) rotate(220deg);
+  }
+}
+
+select {
+  appearance: none;
+  border: var(--border-1) solid var(--border-colour);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  padding: var(--spacing-small) var(--space-4xl) var(--spacing-small) var(--space-sm);
+  cursor: pointer;
+  text-align: right;
+
+  &:hover {
+    border-color: var(--accent-colour);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-colour);
+    outline-offset: 2px;
+  }
+
+  option {
+    padding: var(--spacing-small);
+  }
+}
+
+.guessLetters {
+  display: grid;
+  grid-template-columns: repeat(var(--guessCount), auto);
+  gap: var(--spacing-small);
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  /* CSS custom properties for game-tile component */
+  --colour-tile-border: var(--border-colour);
+  --colour-tile-border-filled: var(--border-colour);
+  --colour-focus: var(--accent-colour);
+  --colour-focus-ring: rgba(249, 115, 22, 0.25);
+
+  game-tile {
+    --tile-font-size: var(--font-2xl);
+    --tile-border-radius: var(--radius);
+    --tile-border-width: var(--border-2);
+    font-family: var(--font-family-base);
+
+    &[disabled] {
+      opacity: 0.35;
+    }
+  }
+}
+
+
+.turn-indicator {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-small);
+  font-size: var(--font-md);
+  color: var(--text);
+  display: flex;
+  width: max-content;
+}
+
+.button-group {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.correct {
+  background: var(--colour-success-bg);
+  border-color: var(--colour-success-border);
+  color: var(--colour-success-text);
+}
+
+.present {
+  background: var(--colour-warning-bg);
+  border-color: var(--colour-warning-border);
+  color: var(--colour-warning-text);
+}
+
+.absent {
+  background: var(--colour-absent-bg);
+  border-color: var(--colour-absent-border);
+  color: var(--colour-absent-text);
+  opacity: 0.55;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.96);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 540px) {
+  :root {
+    --tile-size: 3.5rem;
+  }
+
+  body {
+    padding: var(--space-sm);
+    gap: var(--space-xl);
+  }
+
+  h1 {
+    font-size: var(--font-xl);
+  }
+}
