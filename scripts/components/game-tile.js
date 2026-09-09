@@ -31,9 +31,9 @@ class GameTile extends HTMLElement {
           align-items: center;
           justify-content: center;
           --tile-scale: var(--scale, 1);
-          --tile-font-size: calc(1.5rem * var(--tile-scale));
+          --tile-font-size: calc(2rem * var(--tile-scale));
           --tile-size: calc(4rem * var(--tile-scale));
-          --tile-border-radius: calc(var(--radius-sm, 0.25rem) * var(--tile-scale));
+          --tile-border-radius: calc(var(--radius-small, 0.25rem) * var(--tile-scale));
           --tile-border-width: var(--border-sm, 2px);
           --tile-bg: var(--colour-tile-bg, #ffffff);
           --tile-border: var(--border-colour, #d3d6da);
@@ -64,7 +64,7 @@ class GameTile extends HTMLElement {
         }
 
         :host([disabled]) {
-          opacity: 0.5;
+          opacity: 0.35;
           pointer-events: none;
         }
 
@@ -87,7 +87,7 @@ class GameTile extends HTMLElement {
           justify-content: center;
           width: var(--tile-size);
           height: var(--tile-size);
-          font-family: var(--font-family-base, "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif);
+          font-family: var(--font-family, "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif);
           font-size: var(--tile-font-size);
           font-weight: bold;
           text-transform: uppercase;

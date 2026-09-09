@@ -2,13 +2,13 @@
 
 @media (prefers-color-scheme: light) {
   html:has(#ThemeToggle:checked) {
-    --bg: var(--colour-dark-slate);
+    --colour-bg: var(--colour-dark-slate);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   html:has(#ThemeToggle:checked) {
-    --bg: var(--colour-white);
+    --colour-bg: var(--colour-white);
   }
 }
 
@@ -39,7 +39,7 @@ select,
 option,
 button {
   font-family: var(--font-family, 'Inter', sans-serif);
-  font-size: var(--font-size, 1rem);
+  font-size: var(--font-size-standard, 1rem);
   font-optical-sizing: auto;
   font-weight: 300;
   font-style: normal;
@@ -57,7 +57,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: var(--bg);
+  background-color: var(--colour-bg);
 
   &:not(.js) {
     .js-only {
@@ -153,17 +153,17 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: var(--font-size-2xlarge);
   font-weight: 900;
 }
 
 h2 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: var(--font-size-xlarge);
   font-weight: 700;
 }
 
 h3 {
-  font-size: 1.2rem;
+  font-size: var(--font-size-large);
   font-weight: 500;
 }
 
@@ -210,11 +210,15 @@ blockquote {
 }
 
 button {
-  padding: var(--spacing-small) var(--spacing-standard);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: var(--spacing-standard);
   background-color: transparent;
   color: var(--text-colour);
   font-family: var(--font-family);
-  font-size: var(--font-size);
+  font-size: var(--font-size-standard);
   border: 1px solid var(--border-colour);
   border-radius: var(--spacing-small);
   cursor: pointer;
@@ -230,7 +234,10 @@ button {
   }
 
   &.icon-btn {
+    font-size: var(--font-size-xlarge);
+    padding: 0;
     letter-spacing: normal;
+    aspect-ratio: 1 / 1;
   }
 }
 
@@ -245,6 +252,29 @@ button {
   }
 }
 
+select {
+  appearance: none;
+  border: 1px solid var(--border-colour);
+  border-radius: var(--radius-small);
+  font-size: var(--font-size-small);
+  padding: var(--spacing-small) var(--spacing-xlarge) var(--spacing-small) var(--spacing-small);
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    border-color: var(--accent-colour);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-colour);
+    outline-offset: 2px;
+  }
+
+  option {
+    padding: var(--spacing-small);
+  }
+}
+
 dialog {
   position: fixed;
   top: 50%;
@@ -254,10 +284,10 @@ dialog {
   padding: 0;
   min-width: 280px;
   max-width: 90vw;
-  border: var(--border-1) solid var(--border-colour);
-  border-radius: var(--radius-lg);
-  background: var(--bg);
-  color: var(--bg-contrast);
+  border: 1px solid var(--border-colour);
+  border-radius: var(--radius-small);
+  background: var(--colour-bg);
+  color: var(--colour-bg-contrast);
   box-shadow: var(--shadow);
 
   &::backdrop {
@@ -268,6 +298,21 @@ dialog {
   &[open] {
     animation: dialogFadeIn 0.2s ease-out;
   }
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-standard) var(--spacing-large);
+    border-bottom: 1px solid var(--border-colour);
+  }
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-standard);
+    padding: var(--spacing-standard) var(--spacing-large);
+  }
 }
 
 @keyframes dialogFadeIn {
@@ -275,6 +320,7 @@ dialog {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -296,8 +342,8 @@ dialog {
     content: attr(data-tooltip);
     position: fixed;
     position-anchor: --tooltip-anchor;
-    background-color: var(--bg-contrast);
-    color: var(--bg);
+    background-color: var(--colour-bg-contrast);
+    color: var(--colour-bg);
     font-size: 0.8rem;
     padding: var(--spacing-small);
     border-radius: var(--spacing-small);
@@ -341,7 +387,7 @@ dialog {
   z-index: 10;
   padding: var(--spacing-small) var(--spacing-standard);
   background: var(--text-colour);
-  color: var(--bg);
+  color: var(--colour-bg);
   transform: translateY(-120%) translateX(-50%);
 }
 
@@ -361,7 +407,7 @@ dialog {
   padding: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg);
+  background-color: var(--colour-bg);
   font-weight: 700;
   border: 1px solid var(--border-colour);
   border-bottom-right-radius: var(--spacing-standard);
@@ -383,8 +429,8 @@ dialog {
 
   .site-title-link {
     width: max-content;
-    background-color: var(--bg-contrast);
-    color: var(--bg);
+    background-color: var(--colour-bg-contrast);
+    color: var(--colour-bg);
     text-decoration: none;
     font-size: 1.5rem;
   }
@@ -407,30 +453,30 @@ dialog {
   position: fixed;
   top: 0;
   right: 0;
-  background-color: var(--bg-contrast);
-  color: var(--bg);
+  background-color: var(--colour-bg-contrast);
+  color: var(--colour-bg);
   border-bottom-left-radius: var(--spacing-standard);
 
   @media (prefers-color-scheme: light) {
     &:active {
-      --bg: var(--colour-dark-slate);
-      --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
+      --colour-bg: var(--colour-dark-slate);
+      --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
 
       &:has(input:checked) {
-        --bg: var(--colour-white);
-        --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
+        --colour-bg: var(--colour-white);
+        --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
       }
     }
   }
 
   @media (prefers-color-scheme: dark) {
     &:active {
-      --bg: var(--colour-white);
-      --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
+      --colour-bg: var(--colour-white);
+      --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
 
       &:has(input:checked) {
-        --bg: var(--colour-dark-slate);
-        --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
+        --colour-bg: var(--colour-dark-slate);
+        --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
       }
     }
   }
@@ -452,12 +498,12 @@ dialog {
       width: var(--spacing-small);
       height: calc(2 * var(--spacing-small));
       display: flex;
-      border: 1px solid var(--bg);
+      border: 1px solid var(--colour-bg);
       content: '';
     }
 
     &::before {
-      background-color: var(--bg);
+      background-color: var(--colour-bg);
       border-top-left-radius: var(--spacing-small);
       border-bottom-left-radius: var(--spacing-small);
       border-right: none;
@@ -540,10 +586,10 @@ dialog {
   margin-top: calc(-1 * var(--spacing-standard));
   display: flex;
   flex-direction: column;
-  color: var(--bg);
+  color: var(--colour-bg);
   overflow: hidden;
   border-bottom-right-radius: var(--spacing-standard);
-  background: var(--bg-contrast);
+  background: var(--colour-bg-contrast);
 
   &::details-content {
     opacity: 0;
@@ -563,7 +609,7 @@ dialog {
   }
 
   summary {
-    background: var(--bg-contrast);
+    background: var(--colour-bg-contrast);
     padding: var(--spacing-standard);
     border-bottom-right-radius: var(--spacing-standard);
     cursor: pointer;
@@ -589,7 +635,7 @@ dialog {
     }
 
     a {
-      color: var(--bg);
+      color: var(--colour-bg);
     }
   }
 }
@@ -641,7 +687,7 @@ dialog {
 
 @media print {
   :root {
-    --bg: #ffffff;
+    --colour-bg: #ffffff;
     --text-colour: #000000;
     --heading-colour: #000000;
     --accent-colour: #000000;

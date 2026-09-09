@@ -1,11 +1,20 @@
 :root {
   --font-family: 'Inter', sans-serif;
-  --font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --font-size-standard: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --font-size-small: 0.875rem;
+  --font-size-large: 1.2rem;
+  --font-size-xlarge: clamp(1.5rem, 3vw, 2rem);
+  --font-size-2xlarge: clamp(2rem, 5vw, 3.25rem);
 
-  --spacing-small: 0.5rem;
   --spacing-standard: 1rem;
-  --spacing-large: 2rem;
-  --spacing-xlarge: 4rem;
+  --spacing-small: calc(var(--spacing-standard) / 2);
+  --spacing-large: calc(var(--spacing-standard) * 2);
+  --spacing-xlarge: calc(var(--spacing-standard) * 4);
+
+  --radius-standard: var(--spacing-standard);
+  --radius-small: calc(var(--radius-standard) / 2);
+  --radius-large: calc(var(--radius-standard) * 2);
+
   --default-transition: 0.3s ease;
 
   /* Color palette */
@@ -17,33 +26,38 @@
   --colour-white: #fdfcf9;
   --colour-black: #121212;
 
-  --bg: light-dark(var(--colour-white), var(--colour-dark-slate));
-  --bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--bg)) 60%);
-  --text-colour: var(--bg-contrast);
-  --heading-colour: color-mix(in oklab, var(--colour-navy) 55%, contrast-color(var(--bg)) 45%);
-  --accent-colour: color-mix(in oklab, var(--colour-teal) 70%, contrast-color(var(--bg)) 30%);
-  --border-colour: var(--bg-contrast);
-  
+  --colour-bg: light-dark(var(--colour-white), var(--colour-dark-slate));
+  --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
+
+  --colour-surface: color-mix(in oklab, var(--colour-bg) 90%, var(--colour-bg-contrast) 10%);
+
+  --text-colour: var(--colour-bg-contrast);
+  --heading-colour: color-mix(in oklab, var(--colour-navy) 55%, contrast-color(var(--colour-bg)) 45%);
+  --accent-colour: color-mix(in oklab, var(--colour-teal) 70%, contrast-color(var(--colour-bg)) 30%);
+  --border-colour: var(--colour-bg-contrast);
+
   /* Semantic status colors, tinted with the main palette hues.
      -bg is a bold fill for tiles; -wash is a subtle tint for message banners. */
   --colour-info: var(--colour-navy);
-  --colour-info-border: color-mix(in oklab, var(--colour-info) 70%, var(--bg-contrast) 30%);
+  --colour-info-border: color-mix(in oklab, var(--colour-info) 70%, var(--colour-bg-contrast) 30%);
   --colour-info-bg: color-mix(in oklab, var(--colour-info) 80%, transparent);
   --colour-info-wash: color-mix(in oklab, var(--colour-info) 16%, transparent);
   --colour-info-text: var(--colour-white);
   --colour-success: color-mix(in oklab, var(--colour-teal) 60%, #22c55e 40%);
   --colour-success-bg: color-mix(in oklab, var(--colour-success) 80%, transparent);
   --colour-success-wash: color-mix(in oklab, var(--colour-success) 16%, transparent);
-  --colour-success-border: color-mix(in oklab, var(--colour-success) 70%, var(--bg-contrast) 30%);
+  --colour-success-border: color-mix(in oklab, var(--colour-success) 70%, var(--colour-bg-contrast) 30%);
   --colour-success-text: var(--colour-white);
   --colour-warning: color-mix(in oklab, var(--colour-light-slate) 40%, #eab308 60%);
   --colour-warning-bg: color-mix(in oklab, var(--colour-warning) 80%, transparent);
   --colour-warning-wash: color-mix(in oklab, var(--colour-warning) 16%, transparent);
-  --colour-warning-border: color-mix(in oklab, var(--colour-warning) 70%, var(--bg-contrast) 30%);
+  --colour-warning-border: color-mix(in oklab, var(--colour-warning) 70%, var(--colour-bg-contrast) 30%);
   --colour-warning-text: var(--colour-white);
   --colour-danger: color-mix(in oklab, var(--colour-medium-slate) 35%, #ef4444 65%);
-  --colour-danger-border: color-mix(in oklab, var(--colour-danger) 70%, var(--bg-contrast) 30%);
+  --colour-danger-border: color-mix(in oklab, var(--colour-danger) 70%, var(--colour-bg-contrast) 30%);
   --colour-danger-bg: color-mix(in oklab, var(--colour-danger) 80%, transparent);
   --colour-danger-wash: color-mix(in oklab, var(--colour-danger) 16%, transparent);
   --colour-danger-text: var(--colour-white);
+  
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }

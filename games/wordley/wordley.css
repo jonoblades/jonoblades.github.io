@@ -1,3 +1,8 @@
+:root {
+  --scale: 1;
+  --guessCount: 5;
+}
+
 
 body {
   &:has(#lengthSelect[data-length='4']) {
@@ -24,8 +29,8 @@ body {
 
 .board-shell {
   display: grid;
-  grid-template-columns: auto auto auto;
-  gap: var(--space-lg);
+  grid-template-columns: repeat(3, auto);
+  gap: var(--spacing-large);
 }
 
 .board-stack {
@@ -37,15 +42,17 @@ body {
 }
 
 #board {
+  --scale: 1.2;
   display: flex;
   align-items: center;
   flex-direction: column;
   gap: var(--spacing-small);
-  padding: var(--space-2xl);
-  border-radius: var(--radius-2xl);
-  background: var(--surface);
-  border: var(--border-1) solid var(--border);
+  padding: var(--spacing-large);
+  border-radius: var(--radius-small);
+  background: var(--colour-surface);
+  border: 1px solid var(--border-colour);
   backdrop-filter: blur(6px);
+  margin: 0;
 
   .player-1::before,
   .player-2::before,
@@ -80,26 +87,19 @@ body {
 
   game-tile.alpha-tile {
     --tile-size: 100%;
-    --tile-font-size: var(--font-base);
-    --tile-border-radius: calc(var(--radius) / 3 * 2);
-    --tile-border-width: var(--border-2);
-
-    aspect-ratio: 1 / 1;
   }
 }
 
 /* Styling for game-tile web component in board rows */
 .tiles game-tile {
-  --tile-font-size: var(--font-2xl);
-  --tile-border-radius: var(--radius);
-  --tile-border-width: var(--border-2);
+  /* --tile-font-size: var(--font-size-2xlarge); */
 }
 
 .row {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--spacing-medium);
 
   .tiles {
     display: grid;
@@ -112,12 +112,12 @@ body {
 #guessForm {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--spacing-small);
   align-items: center;
-  padding: var(--space-2xl);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  border: var(--border-1) solid var(--border);
+  padding: var(--spacing-large);
+  border-radius: var(--radius-small);
+  background: var(--colour-surface);
+  border: 1px solid var(--border-colour);
 }
 
 .select-wrapper {
@@ -127,7 +127,7 @@ body {
   &::after {
     content: '';
     position: absolute;
-    right: var(--space-sm);
+    right: var(--spacing-small);
     top: 50%;
     width: 4px;
     height: 4px;
@@ -147,54 +147,14 @@ body {
   }
 }
 
-select {
-  appearance: none;
-  border: var(--border-1) solid var(--border-colour);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-sm);
-  padding: var(--spacing-small) var(--space-4xl) var(--spacing-small) var(--space-sm);
-  cursor: pointer;
-  text-align: right;
-
-  &:hover {
-    border-color: var(--accent-colour);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--accent-colour);
-    outline-offset: 2px;
-  }
-
-  option {
-    padding: var(--spacing-small);
-  }
-}
-
 .guessLetters {
   display: grid;
   grid-template-columns: repeat(var(--guessCount), auto);
-  gap: var(--spacing-small);
+  gap: var(--spacing-standard);
   justify-content: center;
   border: none;
   padding: 0;
   margin: 0;
-
-  /* CSS custom properties for game-tile component */
-  --colour-tile-border: var(--border-colour);
-  --colour-tile-border-filled: var(--border-colour);
-  --colour-focus: var(--accent-colour);
-  --colour-focus-ring: rgba(249, 115, 22, 0.25);
-
-  game-tile {
-    --tile-font-size: var(--font-2xl);
-    --tile-border-radius: var(--radius);
-    --tile-border-width: var(--border-2);
-    font-family: var(--font-family-base);
-
-    &[disabled] {
-      opacity: 0.35;
-    }
-  }
 }
 
 
@@ -211,8 +171,7 @@ select {
 
 .button-group {
   display: flex;
-  gap: var(--space-lg);
-  margin-top: var(--space-md);
+  gap: var(--spacing-standard);
 }
 
 .correct {
@@ -250,8 +209,8 @@ select {
   }
 
   body {
-    padding: var(--space-sm);
-    gap: var(--space-xl);
+    padding: var(--spacing-small);
+    gap: var(--spacing-xlarge);
   }
 
   h1 {

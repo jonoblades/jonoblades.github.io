@@ -213,6 +213,7 @@ class Wordley {
     }
 
     if (this.#settingsBtn && this.#settingsDialog) {
+      this.#settingsBtn.style.display = 'flex';
       this.#settingsBtn.addEventListener('click', this.#openSettings);
     }
     if (this.#closeSettingsBtn && this.#settingsDialog) {

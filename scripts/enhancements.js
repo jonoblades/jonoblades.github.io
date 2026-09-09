@@ -13,8 +13,7 @@ export default class Enhancements {
   }
 
   #viewCvMode() {
-    const pageName = window.location.pathname.split('/').pop();
-    const isResume = pageName === 'resume.html';
+    const isResume = window.location.pathname === '/resume/';
     const queryParams = new URLSearchParams(window.location.search);
     const showCvMode = isResume && queryParams.get('cv') === 'true';
     const stylesheetId = 'CvStylesheet';
@@ -25,7 +24,7 @@ export default class Enhancements {
         const stylesheet = document.createElement('link');
         stylesheet.id = stylesheetId;
         stylesheet.rel = 'stylesheet';
-        stylesheet.href = './styles/cv.css';
+        stylesheet.href = './cv.css';
         document.head.appendChild(stylesheet);
       }
     } else if (isResume) {
@@ -96,7 +95,7 @@ export default class Enhancements {
     if (navigator && navigator.share) {
       const shareButton = document.getElementById('ShareButton');
       if (shareButton) {
-        shareButton.style.display = 'block';
+        shareButton.style.display = 'flex';
         shareButton.addEventListener('click', async () => {
           try {
             await navigator.share({
