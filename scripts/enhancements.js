@@ -1,45 +1,25 @@
-export default class Enhancements {
+import BaseClass from "./BaseClass.js";
+
+export default class Enhancements extends BaseClass {
   constructor() {
-    document.addEventListener('DOMContentLoaded', () => {
-      this.#init();
-      this.#addShareButton();
+    super();
+    this.init(async () => {
+      await this.#init();
     });
   }
 
-  #init() {
+  async #init() {
     document.body.classList.add('js');
     this.#initTableOfContents();
-    this.#viewCvMode();
-  }
-
-  #viewCvMode() {
-    const isResume = window.location.pathname === '/resume/';
-    const queryParams = new URLSearchParams(window.location.search);
-    const showCvMode = isResume && queryParams.get('cv') === 'true';
-    const stylesheetId = 'CvStylesheet';
-
-    if (showCvMode) {
-      this.#addCvLink(false);
-      if (!document.getElementById(stylesheetId)) {
-        const stylesheet = document.createElement('link');
-        stylesheet.id = stylesheetId;
-        stylesheet.rel = 'stylesheet';
-        stylesheet.href = './cv.css';
-        document.head.appendChild(stylesheet);
-      }
-    } else if (isResume) {
-      this.#addCvLink(true);
-      document.getElementById(stylesheetId)?.remove();
-    } else {
-      document.getElementById(stylesheetId)?.remove();
-    }
+    this.#addShareButton();
+    this.#addThemeToggleListener();
   }
 
   #initTableOfContents() {
     const toc = document.getElementById('TableOfContents');
     if (toc) {
       const titles = document.querySelectorAll('h2, h3');
-      if (titles.length > 0) {
+      if (titles.length > 3) {
         titles.forEach(title => {
           if (!title.id) {
             const usedIds = new Set();
@@ -53,7 +33,7 @@ export default class Enhancements {
           const link = document.createElement('a');
           link.textContent = title.textContent;
           link.href = `#${title.id}`;
-          link.addEventListener('click', () => {
+          this.addListener(link, 'click', () => {
             const tocDetails = toc.closest('details');
             if (tocDetails) {
               tocDetails.open = false;
@@ -65,6 +45,7 @@ export default class Enhancements {
           }
           toc.appendChild(li);
         });
+        toc.classList.remove('hidden');
       }
     }
   }
@@ -91,12 +72,20 @@ export default class Enhancements {
     return id;
   }
 
+  #addThemeToggleListener() {
+    const themeToggleCheckbox = document.getElementById('ThemeToggle');
+    this.addListener(themeToggleCheckbox, 'change', (ev) => {
+      this.settingsService.theme = ev.currentTarget.checked ? 'other' : 'system';
+    });
+    themeToggleCheckbox.checked = this.settingsService.theme === 'other';
+  }
+
   #addShareButton() {
     if (navigator && navigator.share) {
       const shareButton = document.getElementById('ShareButton');
       if (shareButton) {
-        shareButton.style.display = 'flex';
-        shareButton.addEventListener('click', async () => {
+        shareButton.classList.remove('hidden');
+        this.addListener(shareButton, 'click', async () => {
           try {
             await navigator.share({
               title: document.title,
@@ -110,15 +99,5 @@ export default class Enhancements {
         });
       }
     }
-  }
-
-  #addCvLink(isCvLink) {
-    const viewCvLink = document.createElement('a');
-    viewCvLink.classList.add('no-print');
-    viewCvLink.textContent = `View as ${isCvLink ? '2-page CV' : 'résumé'}`;
-    viewCvLink.href = `${window.location.pathname}${isCvLink ? '?cv=true' : ''}`;
-    const header = document.querySelector('header');
-    const spacer = header?.querySelector('.spacer');
-    header?.insertBefore(viewCvLink, spacer);
   }
 }

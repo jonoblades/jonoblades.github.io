@@ -1,9 +1,10 @@
 /**
- * @fileoverview Wordley - A Wordle-style word guessing game.
  * Features: configurable word lengths (4-6), timer mode, 1-2 player support,
  * localStorage persistence for settings and statistics.
  * @module game
  */
+import BaseClass from '/scripts/BaseClass.js';
+import definitionsService from '/scripts/DefinitionsService.js';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -13,98 +14,7 @@ const STATUS_PRIORITY = Object.freeze({
   correct: 2,
 });
 
-async function loadWords(length = 5) {
-  const response = await fetch(`../data/words-${length}-letter.json`);
-  if (!response.ok) throw new Error(`Unable to load words-${length}-letter.json`);
-  return response.json();
-}
-
-const DATAMUSE_POS = Object.freeze({
-  n: 'noun',
-  v: 'verb',
-  adj: 'adjective',
-  adv: 'adverb',
-  u: 'unknown',
-});
-
-async function fetchDefinitionFromDictionaryApi(word) {
-  const response = await fetch(
-    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
-    {
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  );
-
-  if (!response || !response.ok) return null;
-
-  const data = await response.json();
-  const meanings = data?.[0]?.meanings;
-  if (!meanings || meanings.length === 0) return null;
-
-  const results = [];
-  for (const meaning of meanings) {
-    const partOfSpeech = meaning.partOfSpeech;
-    const definition = meaning.definitions?.[0]?.definition;
-    if (partOfSpeech && definition) {
-      results.push({ partOfSpeech, definition });
-    }
-  }
-  return results.length > 0 ? results : null;
-}
-
-// Fallback used when dictionaryapi.dev is unreachable (it has had recurring outages).
-async function fetchDefinitionFromDatamuse(word) {
-  const response = await fetch(
-    `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=d&max=1`,
-  );
-
-  if (!response || !response.ok) return null;
-
-  const data = await response.json();
-  const defs = data?.[0]?.defs;
-  if (!defs || defs.length === 0) return null;
-
-  const results = [];
-  for (const entry of defs) {
-    const [abbr, ...rest] = entry.split('\t');
-    const definition = rest.join('\t').trim();
-    if (!definition) continue;
-    results.push({
-      partOfSpeech: DATAMUSE_POS[abbr] ?? abbr,
-      definition,
-    });
-  }
-  return results.length > 0 ? results : null;
-}
-
-async function fetchDefinition(word) {
-  if (!word) return null;
-
-  const isLocalHost =
-    typeof window !== 'undefined' &&
-    ['localhost', '127.0.0.1'].includes(window.location.hostname);
-
-  if (isLocalHost) {
-    // return null;
-  }
-
-  try {
-    return await fetchDefinitionFromDatamuse(word);
-  } catch {
-    // fall through to fallback provider
-  }
-
-  try {
-    const result = await fetchDefinitionFromDictionaryApi(word);
-    if (result) return result;
-  } catch {
-    return null;
-  }
-}
-
-class Wordley {
+class Wordley extends BaseClass {
   static STATS_KEY = 'wordley_stats';
   static SETTINGS_KEY = 'wordley_settings';
 
@@ -127,8 +37,8 @@ class Wordley {
 
   #alphabetTiles = new Map();
   #letterStatusMap = new Map();
-  #allowedWords = [];
-  #allowedWordsSet = new Set();
+  // #allowedWords = [];
+  // #allowedWordsSet = new Set();
   #secret = null;
   #row = 0;
   #gameOver = false;
@@ -145,6 +55,7 @@ class Wordley {
   #winner = null;
 
   constructor(options = {}) {
+    super();
     this.options = {
       boardId: 'board',
       formId: 'guessForm',
@@ -158,18 +69,21 @@ class Wordley {
       maxRows: 6,
       ...options,
     };
-
-    this.#allowedWords = this.options.allowedWords ?? [];
-    this.#allowedWordsSet = new Set(this.#allowedWords);
+    
     this.#wordLength = this.options.wordLength;
     this.#maxRows = this.options.maxRows;
     this.#stats = this.#loadStats();
+
+    this.init(async () => { 
+      await this.#init();
+    });
   }
 
-  async init() {
+  async #init() {
     this.#board = this.options.board || document.getElementById(this.options.boardId);
     this.#form = this.options.form || document.getElementById(this.options.formId);
     this.#lengthSelect = this.options.lengthSelect || document.getElementById(this.options.lengthSelectId);
+    /* c8 ignore next */
     this.#button = this.options.button || (this.#form ? this.#form.querySelector(this.options.buttonSelector) : null);
     this.#resetButton = this.options.resetButton || document.getElementById(this.options.resetButtonId);
     this.#alphaCols = [
@@ -202,38 +116,38 @@ class Wordley {
 
     if (this.#lengthSelect) {
       this.#lengthSelect.value = String(this.#wordLength);
-      this.#lengthSelect.addEventListener('change', this.#handleLengthChange);
+      this.addListener(this.#lengthSelect, 'change', this.#handleLengthChange);
     }
 
     await this.#applyLength(this.#wordLength);
 
-    this.#form.addEventListener('submit', this.#handleSubmit);
+    this.addListener(this.#form, 'submit', this.#handleSubmit);
     if (this.#resetButton) {
-      this.#resetButton.addEventListener('click', this.#handleReset);
+      this.addListener(this.#resetButton, 'click', this.#handleReset);
     }
 
     if (this.#settingsBtn && this.#settingsDialog) {
-      this.#settingsBtn.style.display = 'flex';
-      this.#settingsBtn.addEventListener('click', this.#openSettings);
+      this.#settingsBtn.classList.remove('hidden');
+      this.addListener(this.#settingsBtn, 'click', this.#openSettings);
     }
     if (this.#closeSettingsBtn && this.#settingsDialog) {
-      this.#closeSettingsBtn.addEventListener('click', this.#closeSettings);
+      this.addListener(this.#closeSettingsBtn, 'click', this.#closeSettings);
     }
     if (this.#settingsDialog) {
-      this.#settingsDialog.addEventListener('click', this.#handleDialogBackdrop);
+      this.addListener(this.#settingsDialog, 'click', this.#handleDialogBackdrop);
     }
 
     if (this.#timerSelect) {
-      this.#timerSelect.addEventListener('change', this.#handleTimerChange);
+      this.addListener(this.#timerSelect, 'change', this.#handleTimerChange);
     }
 
     this.#playerCountInputs.forEach((input) => {
-      input.addEventListener('change', this.#handlePlayerCountChange);
+      this.addListener(input, 'change', this.#handlePlayerCountChange);
     });
 
     this.#letterInputs.forEach((input) => {
-      input.addEventListener('tile-input', this.#handleLetterInput);
-      input.addEventListener('tile-keydown', this.#handleLetterKeydown);
+      this.addListener(input, 'tile-input', this.#handleLetterInput);
+      this.addListener(input, 'tile-keydown', this.#handleLetterKeydown);
     });
 
     this.#focusFirstLetter();
@@ -250,8 +164,7 @@ class Wordley {
       this.#maxRows = baseRows;
     }
 
-    this.#allowedWords = await loadWords(this.#wordLength);
-    this.#allowedWordsSet = new Set(this.#allowedWords);
+    await definitionsService.getWords(this.#wordLength);
 
     if (this.#lengthSelect) {
       this.#lengthSelect.setAttribute('data-length', String(this.#wordLength));
@@ -265,7 +178,7 @@ class Wordley {
       input.value = '';
     });
 
-    this.#secret = this.#pickSecret();
+    this.#secret = await this.#pickSecret();
     this.#row = 0;
     this.#gameOver = false;
     this.#timerStartedFirstRow = false;
@@ -297,8 +210,9 @@ class Wordley {
     this.#board.appendChild(fragment);
   }
 
-  #pickSecret() {
-    return this.#allowedWords[Math.floor(Math.random() * this.#allowedWords.length)];
+  async #pickSecret() {
+    const words = await definitionsService.getWords(this.#wordLength);
+    return Array.from(words)[Math.floor(Math.random() * words.size)];
   }
 
   #buildAlphabet() {
@@ -428,9 +342,9 @@ class Wordley {
     }
   }
 
-  #handleSubmit = (event) => {
+  #handleSubmit = async (event) => {
     event.preventDefault();
-    this.#makeGuess();
+    await this.#makeGuess();
   };
 
   #handleLengthChange = async (event) => {
@@ -481,10 +395,8 @@ class Wordley {
 
   #loadSettings() {
     try {
-      const stored = localStorage.getItem(Wordley.SETTINGS_KEY);
-      if (stored) {
-        const settings = JSON.parse(stored);
-
+      const settings = this.settingsService.wordley_settings;
+      if (settings) {
         if (settings.wordLength && this.#lengthSelect) {
           this.#wordLength = settings.wordLength;
           this.#lengthSelect.value = String(settings.wordLength);
@@ -508,16 +420,11 @@ class Wordley {
   }
 
   #saveSettings() {
-    try {
-      const settings = {
-        wordLength: this.#wordLength,
-        timerDuration: this.#timerDuration,
-        playerCount: this.#playerCount,
-      };
-      localStorage.setItem(Wordley.SETTINGS_KEY, JSON.stringify(settings));
-    } catch (e) {
-      console.warn('Failed to save settings to localStorage:', e);
-    }
+    this.settingsService.wordley_settings = {
+      wordLength: this.#wordLength,
+      timerDuration: this.#timerDuration,
+      playerCount: this.#playerCount,
+    };
   }
 
   #startTimer() {
@@ -687,7 +594,7 @@ class Wordley {
     this.#getActiveInputs()[0]?.focus();
   }
 
-  #makeGuess() {
+  async #makeGuess() {
     if (this.#gameOver || this.#row >= this.#maxRows) return;
 
     const activeInputs = this.#getActiveInputs();
@@ -698,12 +605,13 @@ class Wordley {
       this.#setMessage(`Enter a ${this.#wordLength}-letter word.`, 'error');
       return;
     }
-    if (!this.#allowedWordsSet.has(guess)) {
+    if (!(await definitionsService.validateWord(guess))) {
       this.#setMessage('Word not in list.', 'error');
       return;
     }
 
     const rowEl = this.#board?.querySelector(`.row[data-row='${this.#row}']`);
+    /* c8 ignore next */
     const tiles = rowEl
       ? Array.from(rowEl.querySelectorAll('.tiles game-tile')).slice(0, this.#wordLength)
       : [];
@@ -713,6 +621,7 @@ class Wordley {
     }
 
     this.#scoreGuess(guess, tiles);
+    /* c8 ignore next */
     this.#displayDefinition(guess, rowEl || null);
 
     const isWin = guess === this.#secret;
@@ -785,7 +694,7 @@ class Wordley {
   async #displayDefinition(word, rowEl) {
     if (!rowEl) return;
 
-    const definitions = await fetchDefinition(word);
+    const definitions = await definitionsService.fetchDefinition(word);
     if (definitions && definitions.length > 0) {
       const htmlRowEl = rowEl;
       const tooltipId = `tooltip-${htmlRowEl.dataset.row}-${Date.now()}`;
@@ -823,15 +732,7 @@ class Wordley {
   }
 
   #loadStats() {
-    try {
-      const stored = localStorage.getItem(Wordley.STATS_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (e) {
-      console.warn('Failed to load stats from localStorage:', e);
-    }
-    return this.#createEmptyStats();
+    return this.settingsService.wordley_stats || this.#createEmptyStats();
   }
 
   #createEmptyStats() {
@@ -853,11 +754,7 @@ class Wordley {
   }
 
   #saveStats() {
-    try {
-      localStorage.setItem(Wordley.STATS_KEY, JSON.stringify(this.#stats));
-    } catch (e) {
-      console.warn('Failed to save stats to localStorage:', e);
-    }
+    this.settingsService.wordley_stats = this.#stats;
   }
 
   #recordStat(wordLength, guesses) {
@@ -865,6 +762,7 @@ class Wordley {
 
     if (this.#playerCount === 1) {
       const key = guesses === 'failed' ? 'failed' : guesses;
+      /* c8 ignore next */
       if (this.#stats.singlePlayer[wordLength][key] !== undefined) {
         this.#stats.singlePlayer[wordLength][key]++;
       }
@@ -933,9 +831,6 @@ class Wordley {
   }
 }
 
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
+export { Wordley };
+
     const game = new Wordley();
-    game.init().catch((err) => console.error(err));
-  });
-}

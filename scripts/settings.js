@@ -1,12 +1,13 @@
 class SettingsService {
   #settings = {
-    theme: 'system'
+    theme: 'system',
+    wordley_settings: 'wordley_settings',
+    wordley_stats: 'wordley_stats'
   }
 
   constructor() {
     document.addEventListener('DOMContentLoaded', () => {
       this.#loadSettings();
-      this.#addThemeToggleListener();
     });
   }
   
@@ -25,20 +26,28 @@ class SettingsService {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
-  #addThemeToggleListener() {
-    const themeToggleCheckbox = document.getElementById('ThemeToggle');
-    themeToggleCheckbox.addEventListener('change', (ev) => {
-      this.theme = ev.currentTarget.checked ? 'other' : 'system';
-    });
-    themeToggleCheckbox.checked = this.theme === 'other';
-  }
-
   get theme() {
     return this.#settings.theme;
   }
 
   set theme(value) {
     this.#saveSetting('theme', value);
+  }
+
+  get wordley_settings() {
+    return this.#settings.wordley_settings;
+  }
+
+  set wordley_settings(value) {
+    this.#saveSetting('wordley_settings', value);
+  }
+
+  get wordley_stats() {
+    return this.#settings.wordley_stats;
+  }
+
+  set wordley_stats(value) {
+    this.#saveSetting('wordley_stats', value);
   }
 }
 

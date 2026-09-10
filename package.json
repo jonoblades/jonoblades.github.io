@@ -1,0 +1,22 @@
+{
+  "name": "jonoblades.github.io",
+  "version": "1.0.0",
+  "description": "Jonoblades Homepage",
+  "main": "index.html",
+  "repository": "https://github.com/jonoblades/jonoblades.github.io.git",
+  "author": "Jonathan <jonoblades@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.0",
+    "jsdom": "26",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  }
+}

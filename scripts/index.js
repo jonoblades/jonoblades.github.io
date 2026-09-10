@@ -1,5 +1,11 @@
-import settingsService from './settings.js';
+import BaseClass from './BaseClass.js';
 import Enhancements from './enhancements.js';
 
-const settings = settingsService;
-const enhancements = new Enhancements();
+class Main extends BaseClass {
+  constructor() {    
+    super();
+    const enhancements = new Enhancements();
+  }
+}
+
+export default Main;

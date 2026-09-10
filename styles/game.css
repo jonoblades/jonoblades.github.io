@@ -12,10 +12,6 @@
   --colour-absent-text: var(--colour-white);
 }
 
-#SettingsButton {
-  display: none;
-}
-
 .radio-group {
   display: flex;
   gap: var(--spacing-small);

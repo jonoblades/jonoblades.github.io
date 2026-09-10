@@ -1,90 +1,78 @@
-# Jonathan Blades | Professional Résumé
+# Jonathan Blades | Personal site
 
-A lightweight, accessible online résumé for Jonathan Blades, a Senior Front-End Engineer specialising in Angular, TypeScript, UX and accessibility.
+The personal website of Jonathan Blades, a software developer, writer and maker based near Glasgow, Scotland.
+
+The site brings together professional experience, writing, personal projects and browser games in a small, accessible
+static website.
 
 ## Live site
 
-My accessible online résumé, built with semantic HTML and modern CSS.
+[Visit jonoblades.github.io](https://jonoblades.github.io/)
 
-[View my published résumé](https://jonoblades.github.io/)
+## Site sections
 
-## About
+- [About](https://jonoblades.github.io/) - background, professional interests and projects.
+- [Writing](https://jonoblades.github.io/writing) - fiction, story ideas and work in progress.
+- [Resume](https://jonoblades.github.io/resume) - professional experience, skills and development.
+- [Games](https://jonoblades.github.io/games) - playable browser projects:
+	- [Wordley](https://jonoblades.github.io/games/wordley), a word guessing game with configurable word length, timer
+		and player count.
+	- [Sudoku](https://jonoblades.github.io/games/sudoku), a generated 9x9 number puzzle with validation.
+	- [Futile](https://jonoblades.github.io/games/futile), a turn-based tile game for two to four players.
 
-This site summarises my professional experience, technical skills, selected work, education and ongoing professional development.
+## Technology
 
-My experience includes:
+The site is built with:
 
-- Senior front-end engineering
-- Angular and TypeScript development
-- UX and interaction design
-- Web accessibility
-- Automated testing
-- Reusable component architecture
-- Azure DevOps and CI/CD
-- Technical leadership, mentoring and line management
-- Enterprise infrastructure and systems administration
+- Jekyll and GitHub Pages for page generation and deployment.
+- Liquid layouts and includes for shared page structure, navigation and footers.
+- Semantic HTML and modern CSS, including custom properties, responsive styles, colour-scheme support and print styles.
+- Vanilla JavaScript modules for progressive enhancements, theme settings, sharing, table-of-contents generation and
+	game logic.
+- A reusable `game-tile` Web Component shared by the games.
 
-## Selected work
-
-The résumé includes selected examples of my professional and personal work, including:
-
-### Transport asset-management platform
-
-Front-end engineering and UX work on an enterprise application used by approximately 600 people to support the management of critical transport infrastructure across Scotland.
-
-### Reusable front-end architecture and quality improvements
-
-The creation of reusable Angular components, shared implementation patterns and automated tests to reduce duplicated code, improve consistency and increase confidence in application changes.
-
-### scan-compromised
-
-A self-contained, CI-friendly npm command-line tool for identifying packages associated with known software supply-chain compromises.
-
-[View scan-compromised on GitHub](https://github.com/jonoblades/scan-compromised)
+There is no front-end framework or client-side package dependency. The site is designed to remain useful without
+JavaScript, with JavaScript adding enhancements and powering the interactive games.
 
 ## Accessibility
 
-Accessibility is treated as a core requirement of the site rather than an optional enhancement.
+Accessibility is part of the site's design and implementation. It includes semantic landmarks and headings, a skip
+link, keyboard focus styles, native controls, responsive layouts, light and dark colour schemes, forced-colour support,
+print styles and progressive enhancement.
 
-The implementation includes:
+## Local development
 
-- Semantic HTML landmarks and headings
-- A skip link for keyboard users
-- Visible keyboard focus indicators
-- Native links and form controls
-- Responsive layouts supporting narrow viewports and browser zoom
-- Light and dark colour-scheme support
-- Windows forced-colour support
-- Print-specific presentation
-- Machine-readable dates
-- Meaningful link text
-- Progressive enhancement
-- A page that remains usable without JavaScript
+Install Ruby and Bundler, then install the project's GitHub Pages dependencies:
 
-The content and interaction patterns are designed with WCAG-informed practices in mind.
+```sh
+bundle install
+```
 
-## Design and technical approach
+Start the local Jekyll server:
 
-The site deliberately uses a small and resilient technology stack:
+```sh
+bundle exec jekyll serve
+```
 
-- Semantic HTML
-- Modern CSS
-- CSS custom properties
-- CSS nesting
-- Responsive media queries
-- `prefers-color-scheme`
-- `light-dark()`
-- `color-mix()`
-- `contrast-color()`
-- `:has()`
-- Print styles
-
-There is no application framework, build process or client-side JavaScript dependency. This helps keep the site fast, portable and easy to maintain.
+Open `http://localhost:4000` in a browser. Jekyll writes generated output to `_site/`; edit the source files instead of
+editing generated files there.
 
 ## Project structure
 
 ```text
-resume/
-├── index.html
-├── styles.css
-└── README.md
+.
+├── _config.yml              # Jekyll site configuration
+├── _includes/               # Shared head, header, navigation and footer markup
+├── _layouts/                # Default and game page layouts
+├── games/                   # Games index, game pages and game data
+├── resume/                  # Resume page and supporting styles/scripts
+├── scripts/                 # Shared JavaScript and game-tile Web Component
+├── styles/                  # Global, game and variable-based stylesheets
+├── writing/                 # Writing page
+├── index.html               # About page
+├── Gemfile                  # GitHub Pages/Jekyll dependencies
+└── _site/                   # Generated Jekyll output
+```
+
+The published site is configured in `_config.yml` for GitHub Pages at `https://jonoblades.github.io`.
+- `contrast-color()`

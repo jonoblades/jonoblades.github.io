@@ -1,0 +1,57 @@
+  <header>
+    <a class="skip-link no-print" href="#main-content">Skip to main content</a>
+    <div class="site-title no-print">
+      <a class="site-title-link" href="{{ '/' | relative_url }}">
+        Jonathan Blades
+      </a>
+      <span class="page-title">
+        {% if page.page_id == 'about' %}
+        About me
+        {% else %}
+        {{ page.heading | default: page.title }}
+        {% endif %}
+      </span>
+    </div>
+    <div class="theme-toggle no-print" data-tooltip="Toggle theme">
+      <label for="ThemeToggle">
+        <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
+        <span class="visually-hidden">Use opposite colour theme.</span>
+      </label>
+    </div>
+    <h1>{{ page.heading | default: page.title }}</h1>
+
+    <button
+      data-tooltip="Share this page"
+      type="button"
+      id="ShareButton"
+      class="share-button no-print hidden"
+      aria-label="Share this page"
+    >
+      Share
+    </button>
+    {% if include.showNavigation %}
+    {% include navigation.html %}
+    <div class="subtitle">
+      <span>{{ page.subtitle }}</span>
+      {% if page.tags %}
+      <ul class="specialisms" aria-label="{{ page.tags_label | default: 'Specialisms' }}">
+        {% for item in page.tags %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% if include.showSettings %}
+    <a href="/games">Back to games</a>
+    <div class="spacer"></div>
+    <button 
+      id="SettingsButton"
+      type="button"
+      data-tooltip="Settings"
+      class="icon-btn settings-button no-print hidden"
+      aria-label="Settings">
+      ⚙
+    </button>
+    {% endif %}
+  </header>

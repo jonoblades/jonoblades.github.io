@@ -1,18 +1,25 @@
-class Sudoku {
+import BaseClass from "/scripts/BaseClass.js";
+
+class Sudoku extends BaseClass {
   #grid;
   #puzzles = [];
   #selectedPuzzle;
 
   constructor() {
-    document.addEventListener('DOMContentLoaded', async () => {
-      this.#grid = document.querySelectorAll('.sudoku-grid .cell');
-      this.#puzzles = await this.#loadPuzzles();
-      this.#selectedPuzzle = this.#selectPuzzle();
-      this.#renderPuzzle(this.#selectedPuzzle);
+    super();
+    this.init(async () => { 
+      await this.#init();
+    });
+  }
 
-      document.getElementById('validate-button').addEventListener('click', () => {
-        this.#validatePuzzle();
-      });
+  async #init() {
+    this.#grid = document.querySelectorAll('.sudoku-grid .cell');
+    this.#puzzles = await this.#loadPuzzles();
+    this.#selectedPuzzle = this.#selectPuzzle();
+    this.#renderPuzzle(this.#selectedPuzzle);
+
+    this.addListener(document.getElementById('validate-button'), 'click', () => {
+      this.#validatePuzzle();
     });
   }
 
@@ -27,8 +34,6 @@ class Sudoku {
   }
 
   #renderPuzzle(puzzle) {
-    console.table(puzzle.puzzle);
-    console.table(puzzle.solution);
     const puzzleNumberElement = document.querySelector('.sudoku-puzzle-number');
     const puzzleDifficultyElement = document.querySelector('.sudoku-puzzle-difficulty');
     puzzleNumberElement.textContent = puzzle.id;
@@ -37,7 +42,7 @@ class Sudoku {
       row.forEach((cell, cellIndex) => {
         const index = rowIndex * 9 + cellIndex;
         const cellElement = this.#grid[index];
-        
+
         if (cell) {
           cellElement.value = cell;
           cellElement.readonly = true;
@@ -48,7 +53,7 @@ class Sudoku {
           cellElement.status = '';
         }
 
-        cellElement.addEventListener('keydown', (event) => {
+        this.addListener(cellElement, 'keydown', (event) => {
           if (event.key === 'ArrowUp') {
             this.#moveUp(index);
           } else if (event.key === 'ArrowDown') {
