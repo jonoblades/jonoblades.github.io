@@ -57,6 +57,37 @@ bundle exec jekyll serve
 Open `http://localhost:4000` in a browser. Jekyll writes generated output to `_site/`; edit the source files instead of
 editing generated files there.
 
+## Testing
+
+The JavaScript modules and interactive pages are tested with Vitest in a jsdom environment. Tests are grouped by
+the code they cover:
+
+- `tests/scripts/` - shared services, base classes and site enhancements.
+- `tests/pages/` - page and game behavior for the resume, Sudoku and Wordley pages.
+
+Run the test suite once:
+
+```sh
+yarn test:run
+```
+
+Run Vitest in watch mode while developing:
+
+```sh
+yarn test
+```
+
+Generate text, HTML and LCOV coverage reports:
+
+```sh
+yarn test:coverage
+```
+
+Coverage is collected with V8 and the configured minimum threshold is 80% for statements, branches, functions and
+lines. HTML coverage output is written to `coverage/`.
+
+![Coverage](https://codecov.io/gh/jonoblades/jonoblades.github.io/branch/main/svg)
+
 ## Project structure
 
 ```text
