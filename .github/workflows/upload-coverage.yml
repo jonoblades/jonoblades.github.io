@@ -1,4 +1,4 @@
-name: Test
+name: Test & Upload Coverage
 
 on:
   push:
@@ -28,7 +28,14 @@ jobs:
       - name: Run tests with coverage
         run: yarn test:coverage
 
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
