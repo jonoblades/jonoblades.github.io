@@ -7,3 +7,5 @@ _site/
 .jekyll-metadata
 .bundle/
 vendor/
+
+test-report.junit.xml
