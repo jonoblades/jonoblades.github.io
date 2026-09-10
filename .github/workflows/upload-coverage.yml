@@ -1,10 +1,6 @@
 name: Test
 
 on:
-  pull_request:
-    branches:
-      - main
-
   push:
     branches:
       - main
@@ -30,4 +26,17 @@ jobs:
         run: yarn install --immutable
       
       - name: Run tests with coverage
-        run: yarn test
+        run: yarn test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: true
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
