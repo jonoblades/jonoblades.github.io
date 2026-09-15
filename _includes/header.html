@@ -4,6 +4,11 @@
       <a class="site-title-link" href="{{ '/' | relative_url }}">
         Jonathan Blades
       </a>
+      {% for item in page.parent %}
+      <a class="parent-link" href="{{ item.link }}">
+        {{ item.title }}
+      </a>
+      {% endfor %}
       <span class="page-title">
         {% if page.page_id == 'about' %}
         About me
@@ -43,7 +48,6 @@
     </div>
     {% endif %}
     {% if include.showSettings %}
-    <a href="/games">Back to games</a>
     <div class="spacer"></div>
     <button 
       id="SettingsButton"
