@@ -2,8 +2,19 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const defaultSettings = {
   theme: 'system',
-  wordley_settings: 'wordley_settings',
-  wordley_stats: 'wordley_stats'
+  wordley_settings: {
+    wordLength: 5,
+    playerCount: 1,
+    timerDuration: 60
+  },
+  wordley_stats: {
+    singlePlayer: {},
+    twoPlayer: {
+      player1: {},
+      player2: {},
+      draws: {}
+    }
+  }
 };
 
 async function loadSettingsService() {
@@ -25,8 +36,8 @@ describe('settings service', () => {
     const settings = await loadSettingsService();
 
     expect(settings.theme).toBe(defaultSettings.theme);
-    expect(settings.wordley_settings).toBe(defaultSettings.wordley_settings);
-    expect(settings.wordley_stats).toBe(defaultSettings.wordley_stats);
+    expect(settings.wordley_settings).toEqual(defaultSettings.wordley_settings);
+    expect(settings.wordley_stats).toEqual(defaultSettings.wordley_stats);
   });
 
   it('loads stored values after DOMContentLoaded', async () => {
@@ -49,8 +60,8 @@ describe('settings service', () => {
     dispatchDomContentLoaded();
 
     expect(settings.theme).toBe('light');
-    expect(settings.wordley_settings).toBe(defaultSettings.wordley_settings);
-    expect(settings.wordley_stats).toBe(defaultSettings.wordley_stats);
+    expect(settings.wordley_settings).toEqual(defaultSettings.wordley_settings);
+    expect(settings.wordley_stats).toEqual(defaultSettings.wordley_stats);
   });
 
   it('does not load unrelated localStorage keys', async () => {
@@ -60,8 +71,8 @@ describe('settings service', () => {
     dispatchDomContentLoaded();
 
     expect(settings.theme).toBe(defaultSettings.theme);
-    expect(settings.wordley_settings).toBe(defaultSettings.wordley_settings);
-    expect(settings.wordley_stats).toBe(defaultSettings.wordley_stats);
+    expect(settings.wordley_settings).toEqual(defaultSettings.wordley_settings);
+    expect(settings.wordley_stats).toEqual(defaultSettings.wordley_stats);
   });
 
   it.each([

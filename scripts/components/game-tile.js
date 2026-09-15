@@ -2,19 +2,81 @@
  * @fileoverview GameTile Web Component for Wordley.
  * A reusable tile component that supports both display and input modes
  * with customizable appearance based on game state.
+ * @module game-tile
  */
 
+import { validateTarget } from '/games/futile/shared.js';
+
+/**
+ * Visual states supported by a game tile.
+ * @typedef {'correct'|'success'|'green'|'present'|'warning'|'yellow'|'absent'|'info'|'blue'|'error'|'danger'|'red'|''} TileStatus
+ */
+
+/**
+ * Input mode used to determine validation and keyboard behavior.
+ * @typedef {'letter'|'number'} TileType
+ */
+
+/**
+ * Detail emitted with the `tile-input` event.
+ * @typedef {object} TileInputDetail
+ * @property {string} value Sanitized tile value.
+ * @property {number} index Tile index from the element's `index` attribute.
+ */
+
+/**
+ * Custom event emitted when an editable tile's value changes.
+ * @typedef {CustomEvent<TileInputDetail>} TileInputEvent
+ */
+
+/**
+ * Detail emitted with the `tile-focus` event.
+ * @typedef {object} TileFocusDetail
+ * @property {number} index Tile index from the element's `index` attribute.
+ */
+
+/**
+ * Detail emitted with the `tile-keydown` event.
+ * @typedef {object} TileKeydownDetail
+ * @property {string} key Keyboard key pressed.
+ * @property {number} index Tile index from the element's `index` attribute.
+ * @property {boolean} shiftKey Whether Shift was held.
+ * @property {boolean} ctrlKey Whether Control was held.
+ * @property {boolean} altKey Whether Alt was held.
+ * @property {KeyboardEvent} originalEvent Original keyboard event.
+ */
+
+/**
+ * Custom event emitted when an editable tile receives focus.
+ * @typedef {CustomEvent<TileFocusDetail>} TileFocusEvent
+ */
+
+/**
+ * Custom event emitted when a key is pressed while an editable tile is focused.
+ * @typedef {CustomEvent<TileKeydownDetail>} TileKeydownEvent
+ */
+
+/** Custom element that renders an editable or readonly game tile. */
 class GameTile extends HTMLElement {
+  /**
+   * Attributes that cause the tile to rerender when changed.
+   * @returns {string[]} Observed attribute names.
+   */
   static get observedAttributes() {
     return ['value', 'name', 'label', 'role', 'readonly', 'type', 'status', 'index', 'disabled', 'placeholder', 'selected'];
   }
 
+  /** Creates the shadow DOM and renders the initial tile. */
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.#render();
   }
 
+  /**
+   * Renders the tile according to its current attributes and mode.
+   * @returns {void}
+   */
   #render() {
     const isReadonly = this.hasAttribute('readonly');
     const value = this.getAttribute('value') || '';
@@ -23,6 +85,8 @@ class GameTile extends HTMLElement {
     const type = this.getAttribute('type') || 'letter';
     const disabled = this.hasAttribute('disabled');
     const placeholder = this.getAttribute('placeholder') || '';
+
+    if (!this.shadowRoot) return;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -153,13 +217,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Connects input listeners to the shadow input element.
+   * @returns {void}
+   */
   #attachInputListeners() {
-    const input = this.shadowRoot.querySelector('input');
+    const input = this.shadowRoot?.querySelector('input');
     if (!input) return;
 
     input.addEventListener('input', (event) => {
-      const target = event.target;
+      const target = validateTarget(event.target, HTMLInputElement);
       const type = this.getAttribute('type') || 'letter';
+
+      if (!target) return;
       let value = target.value;
 
       if (type === 'letter') {
@@ -168,7 +238,7 @@ class GameTile extends HTMLElement {
         value = value.replace(/[^0-9]/g, '');
       }
 
-      target.value = value;
+      if (target) target.value = value;
       this.setAttribute('value', value);
       target.classList.toggle('filled', value.length > 0);
 
@@ -228,18 +298,29 @@ class GameTile extends HTMLElement {
     });
   }
 
+  /**
+   * Applies the default letter input type when the element is connected.
+   * @returns {void}
+   */
   connectedCallback() {
     if (!this.hasAttribute('type')) {
       this.setAttribute('type', 'letter');
     }
   }
 
+  /**
+   * Keeps the rendered tile synchronized with observed attributes.
+   * @param {string} name Changed attribute name.
+   * @param {string|null} oldValue Previous attribute value.
+   * @param {string|null} newValue New attribute value.
+   * @returns {void}
+   */
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
 
     if (name === 'value') {
-      const input = this.shadowRoot.querySelector('input');
-      const div = this.shadowRoot.querySelector('div.tile');
+      const input = this.shadowRoot?.querySelector('input');
+      const div = this.shadowRoot?.querySelector('div.tile');
 
       if (input && input.value !== newValue) {
         input.value = newValue || '';
@@ -250,7 +331,7 @@ class GameTile extends HTMLElement {
         div.classList.toggle('filled', (newValue || '').length > 0);
       }
     } else if (name === 'placeholder') {
-      const input = this.shadowRoot.querySelector('input');
+      const input = this.shadowRoot?.querySelector('input');
       if (input) {
         input.placeholder = newValue || '';
       }
@@ -259,18 +340,36 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns the displayed tile value.
+   * @returns {string} Current tile value.
+   */
   get value() {
     return this.getAttribute('value') || '';
   }
 
+  /**
+   * Sets the displayed tile value.
+   * @param {string} val New tile value.
+   * @returns {void}
+   */
   set value(val) {
     this.setAttribute('value', val || '');
   }
 
+  /**
+   * Returns the form name associated with the tile.
+   * @returns {string} Current tile name.
+   */
   get name() {
     return this.getAttribute('name') || '';
   }
 
+  /**
+   * Sets or removes the form name associated with the tile.
+   * @param {string} val New tile name.
+   * @returns {void}
+   */
   set name(val) {
     if (val) {
       this.setAttribute('name', val);
@@ -279,10 +378,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns the input placeholder text.
+   * @returns {string} Current placeholder.
+   */
   get placeholder() {
     return this.getAttribute('placeholder') || '';
   }
 
+  /**
+   * Sets or removes the input placeholder text.
+   * @param {string} val New placeholder.
+   * @returns {void}
+   */
   set placeholder(val) {
     if (val) {
       this.setAttribute('placeholder', val);
@@ -291,10 +399,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns whether the tile is readonly.
+   * @returns {boolean} Whether readonly mode is enabled.
+   */
   get readonly() {
     return this.hasAttribute('readonly');
   }
 
+  /**
+   * Enables or disables readonly mode.
+   * @param {boolean} val Whether readonly mode should be enabled.
+   * @returns {void}
+   */
   set readonly(val) {
     if (val) {
       this.setAttribute('readonly', '');
@@ -303,10 +420,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns the tile's visual status.
+   * @returns {TileStatus|string} Current status value.
+   */
   get status() {
     return this.getAttribute('status') || '';
   }
 
+  /**
+   * Sets or removes the tile's visual status.
+   * @param {TileStatus|string} val New status value.
+   * @returns {void}
+   */
   set status(val) {
     if (val) {
       this.setAttribute('status', val);
@@ -315,10 +441,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns whether the tile is disabled.
+   * @returns {boolean} Whether input is disabled.
+   */
   get disabled() {
     return this.hasAttribute('disabled');
   }
 
+  /**
+   * Enables or disables tile input.
+   * @param {boolean} val Whether input should be disabled.
+   * @returns {void}
+   */
   set disabled(val) {
     if (val) {
       this.setAttribute('disabled', '');
@@ -327,10 +462,19 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns whether the tile is selected.
+   * @returns {boolean} Whether selected styling is enabled.
+   */
   get selected() {
     return this.hasAttribute('selected');
   }
 
+  /**
+   * Enables or disables selected styling.
+   * @param {boolean} val Whether the tile should be selected.
+   * @returns {void}
+   */
   set selected(val) {
     if (val) {
       this.setAttribute('selected', '');
@@ -339,28 +483,57 @@ class GameTile extends HTMLElement {
     }
   }
 
+  /**
+   * Returns the tile's numeric index.
+   * @returns {number} Tile index.
+   */
   get index() {
     return parseInt(this.getAttribute('index') || '0', 10);
   }
 
+  /**
+   * Sets the tile's numeric index.
+   * @param {number} val New tile index.
+   * @returns {void}
+   */
   set index(val) {
     this.setAttribute('index', String(val));
   }
 
+  /**
+   * Focuses the internal input when the tile is editable.
+   * @returns {void}
+   */
   focus() {
-    const input = this.shadowRoot.querySelector('input');
+    const input = this.shadowRoot?.querySelector('input');
     if (input) {
       input.focus();
     }
   }
 
+  /**
+   * Clears the tile value.
+   * @returns {void}
+   */
   clear() {
     this.value = '';
   }
 }
 
-customElements.define('game-tile', GameTile);
+if (!customElements.get('game-tile')) {
+  customElements.define('game-tile', GameTile);
+}
+
+/** @type {typeof GameTile} */
+const registeredGameTile = /** @type {typeof GameTile} */ (customElements.get('game-tile'));
 
 if (typeof window !== 'undefined') {
-  window.GameTile = GameTile;
+  /**
+   * Window extended with the globally exposed GameTile constructor.
+  * @type {Window & {GameTile?: typeof GameTile}}
+   */
+  const gameWindow = window;
+  gameWindow.GameTile = registeredGameTile;
 }
+
+export default registeredGameTile;

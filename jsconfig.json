@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "/scripts/*": ["scripts/*"]
+    },
+    "checkJs": true
+  },
+  "include": ["scripts/**/*.js", "games/**/*.js"]
+}

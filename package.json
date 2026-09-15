@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Jonoblades Homepage",
   "main": "index.html",
+  "type": "module",
   "repository": "https://github.com/jonoblades/jonoblades.github.io.git",
   "author": "Jonathan <jonoblades@gmail.com>",
   "license": "MIT",

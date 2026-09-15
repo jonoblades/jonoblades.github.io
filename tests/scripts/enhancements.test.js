@@ -82,7 +82,7 @@ describe('Enhancements', () => {
 
     const details = document.querySelector('details');
     expect(details.open).toBe(true);
-    document.querySelector('#TableOfContents a').click();
+    document.querySelector('#TableOfContents a').dispatchEvent(new Event('click'));
     expect(details.open).toBe(false);
   });
 

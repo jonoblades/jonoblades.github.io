@@ -33,19 +33,15 @@ function pageMarkup() {
 
 async function loadWordley() {
   vi.resetModules();
-  const addEventListener = vi.spyOn(document, 'addEventListener');
   const module = await import('../../../games/wordley/wordley.js');
-  const listeners = addEventListener.mock.calls.map(([, listener]) => listener);
-  const initialize = listeners.at(-1);
-  const loadSettings = listeners.at(-2);
-  addEventListener.mockRestore();
-  return { initialize, loadSettings, Wordley: module.Wordley };
+  return { Wordley: module.Wordley };
 }
 
-async function initializePage({ initialize, loadSettings }) {
-  loadSettings?.();
-  await initialize();
+async function initializePage({ Wordley }) {
+  const game = new Wordley();
+  await game._ready();
   await vi.waitFor(() => expect(document.querySelectorAll('#board .row').length).toBeGreaterThan(0));
+  return game;
 }
 
 async function enterGuess(word) {
@@ -284,6 +280,10 @@ describe('Wordley page', () => {
       draws: 0
     });
     expect(game.getStats('other')).toBeDefined();
+
+    settings.wordley_stats = { 4: { 1: 2, failed: 1 } };
+    const legacyStatsGame = new loaded.Wordley();
+    expect(legacyStatsGame.getStats('singlePlayer', 4)).toMatchObject({ 1: 2, failed: 1 });
   });
 
   it('updates timer progress and ends a timed-out game', async () => {
@@ -398,12 +398,9 @@ describe('Wordley page', () => {
     const loaded = await loadWordley();
     const button = document.getElementById('submitGuess');
     const form = document.getElementById('guessForm');
-    const addEventListener = vi.spyOn(document, 'addEventListener');
     const game = new loaded.Wordley({ button, form });
-    const initialize = addEventListener.mock.calls.at(-1)[1];
-    addEventListener.mockRestore();
 
-    await initialize();
+    await game._ready();
     expect(game).toBeDefined();
   });
 

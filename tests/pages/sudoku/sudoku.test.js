@@ -29,11 +29,9 @@ const puzzle = {
 
 async function loadSudoku() {
   vi.resetModules();
-  const addEventListener = vi.spyOn(document, 'addEventListener');
-  await import('../../../games/sudoku/sudoku.js');
-  const initialize = addEventListener.mock.calls.at(-1)[1];
-  addEventListener.mockRestore();
-  return initialize;
+  const { Sudoku } = await import('../../../games/sudoku/sudoku.js');
+  const game = new Sudoku();
+  return () => game._ready();
 }
 
 async function initializePage(initialize) {

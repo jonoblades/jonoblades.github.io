@@ -1,10 +1,48 @@
+// @ts-check
+
 /**
  * Features: configurable word lengths (4-6), timer mode, 1-2 player support,
  * localStorage persistence for settings and statistics.
  * @module game
  */
+import { validateTarget } from '/games/futile/shared.js';
 import BaseClass from '/scripts/BaseClass.js';
 import definitionsService from '/scripts/DefinitionsService.js';
+import GameTile from '/scripts/components/game-tile';
+
+/**
+ * @typedef {object} WordleyOptions
+ * @property {HTMLElement|null} [board]
+ * @property {HTMLFormElement|null} [form]
+ * @property {HTMLSelectElement|null} [lengthSelect]
+ * @property {HTMLButtonElement|null} [resetButton]
+ * @property {HTMLDivElement|null} [alphaLeft]
+ * @property {HTMLDivElement|null} [alphaRight]
+ * @property {HTMLButtonElement|null} [button]
+ * @property {HTMLDivElement|null} [messageBox]
+ * @property {HTMLTemplateElement|null} [rowTemplate]
+ * @property {NodeListOf<HTMLInputElement>|null} [letterInputs]
+ * @property {HTMLElement|null} [lengthValue]
+ * @property {HTMLDialogElement|null} [settingsDialog]
+ * @property {HTMLButtonElement|null} [settingsBtn]
+ * @property {string} boardId
+ * @property {string} formId
+ * @property {string} lengthSelectId
+ * @property {string} resetButtonId
+ * @property {string} alphaLeftId
+ * @property {string} alphaRightId
+ * @property {string} buttonSelector
+ * @property {string[]|null} allowedWords
+ * @property {number} wordLength
+ * @property {1|2|3|4|5|6} maxRows 
+ */
+
+/**
+ * Event emitted by a GameTile after its input value has been sanitized.
+ * @typedef {import('/scripts/components/game-tile.js').TileInputEvent} TileInputEvent
+ * @typedef {import('/scripts/components/game-tile.js').TileFocusEvent} TileFocusEvent
+ * @typedef {import('/scripts/components/game-tile.js').TileKeydownEvent} TileKeydownEvent
+ */
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -14,46 +52,162 @@ const STATUS_PRIORITY = Object.freeze({
   correct: 2,
 });
 
+/**
+ * Word guessing game supporting configurable lengths and player modes.
+ */
 class Wordley extends BaseClass {
+  /**
+   * Storage key for Wordley statistics.
+   * @type {string}
+   */
   static STATS_KEY = 'wordley_stats';
+  /**
+   * Storage key for Wordley settings.
+   * @type {string}
+   */
   static SETTINGS_KEY = 'wordley_settings';
 
+  /**
+   * @type {HTMLElement|null}
+   */
   #board = null;
+  /**
+   * @type {HTMLFormElement|null}
+   */
   #form = null;
+  /**
+   * @type {HTMLButtonElement|null}
+   */
   #button = null;
+  /**
+   * @type {HTMLButtonElement|null}
+   */
   #resetButton = null;
+  /**
+   * @type {HTMLSelectElement|null}
+   */
   #lengthSelect = null;
+  /**
+   * @type {HTMLElement|null}
+   */
   #lengthValue = null;
+  /**
+   * @type {HTMLElement|null}
+   */
   #messageBox = null;
+  /**
+   * @type {HTMLTemplateElement|null}
+   */
   #rowTemplate = null;
+  /**
+   * @type {HTMLInputElement[]}
+   */
   #letterInputs = [];
+  /**
+   * @type {HTMLElement[]}
+   */
   #alphaCols = [];
+  /**
+   * @type {HTMLDialogElement|null}
+   */
   #settingsDialog = null;
+  /**
+   * @type {HTMLElement|null}
+   */
   #settingsBtn = null;
+  /**
+   * @type {HTMLElement|null}
+   */
   #closeSettingsBtn = null;
+  /**
+   * @type {HTMLSelectElement|null}
+   */
   #timerSelect = null;
-  #playerCountInputs = [];
+  /**
+   * @type {NodeListOf<HTMLInputElement>|null}
+   */
+  #playerCountInputs = null;
+  /**
+   * @type {HTMLElement|null}
+   */
   #turnIndicator = null;
 
+  /**
+   * @type {Map<string, GameTile>}
+   */
   #alphabetTiles = new Map();
+  /**
+   * @type {Map<string, 'absent'|'present'|'correct'>}
+   */
   #letterStatusMap = new Map();
   // #allowedWords = [];
   // #allowedWordsSet = new Set();
-  #secret = null;
+  /**
+   * @type {string}
+   */
+  #secret = '';
+  /**
+   * @type {number}
+   */
   #row = 0;
+  /**
+   * @type {boolean}
+   */
   #gameOver = false;
+  /**
+   * @type {number}
+   */
   #wordLength;
+  /**
+   * @type {number}
+   */
   #maxRows;
+  /**
+   * @type {import('/scripts/settings').WordleyStats}
+   */
   #stats;
+  /**
+   * @type {(string|null)[]}
+   */
   #correctPositions = new Array(6).fill(null);
+  /**
+   * @type {number}
+   */
   #timerDuration = 0;
+  /**
+   * @type {ReturnType<typeof setInterval>|null}
+   */
   #timerInterval = null;
+  /**
+   * @type {number}
+   */
   #timerElapsed = 0;
+  /**
+   * @type {boolean}
+   */
   #timerStartedFirstRow = false;
+  /**
+   * @type {number}
+   */
   #playerCount = 1;
+  /**
+   * @type {1|2}
+   */
   #currentPlayer = 1;
+  /**
+   * @type {1|2|null}
+   */
   #winner = null;
 
+  /**
+   * @type {WordleyOptions}
+   */
+  options;
+
+  /**
+   * Creates a Wordley game with optional DOM and game configuration.
+    * @param {Partial<WordleyOptions>} [options={}] Game and DOM configuration overrides.
+   */
   constructor(options = {}) {
     super();
     this.options = {
@@ -69,37 +223,42 @@ class Wordley extends BaseClass {
       maxRows: 6,
       ...options,
     };
-    
-    this.#wordLength = this.options.wordLength;
-    this.#maxRows = this.options.maxRows;
+
+    this.#wordLength = this.options.wordLength || 5;
+    this.#maxRows = this.options.maxRows || 6;
     this.#stats = this.#loadStats();
 
-    this.init(async () => { 
+    this.init(async () => {
       await this.#init();
     });
   }
 
   async #init() {
     this.#board = this.options.board || document.getElementById(this.options.boardId);
-    this.#form = this.options.form || document.getElementById(this.options.formId);
-    this.#lengthSelect = this.options.lengthSelect || document.getElementById(this.options.lengthSelectId);
+    this.#form = this.options.form || document.querySelector(`form#${this.options.formId}`);
+    this.#lengthSelect = this.options.lengthSelect || document.querySelector(`select#${this.options.lengthSelectId}`);
     /* c8 ignore next */
     this.#button = this.options.button || (this.#form ? this.#form.querySelector(this.options.buttonSelector) : null);
-    this.#resetButton = this.options.resetButton || document.getElementById(this.options.resetButtonId);
+    this.#resetButton = this.options.resetButton || document.querySelector(`button#${this.options.resetButtonId}`);
+    const alphaLeft = this.options.alphaLeft || document.getElementById(this.options.alphaLeftId);
+    const alphaRight = this.options.alphaRight || document.getElementById(this.options.alphaRightId);
+    if (!alphaLeft || !alphaRight) {
+      throw new Error('Missing required alpha columns for the game.');
+    }
     this.#alphaCols = [
-      this.options.alphaLeft || document.getElementById(this.options.alphaLeftId),
-      this.options.alphaRight || document.getElementById(this.options.alphaRightId),
+      alphaLeft,
+      alphaRight,
     ];
-    this.#messageBox = this.options.messageBox || document.getElementById('message');
-    this.#rowTemplate = document.getElementById('RowTemplate');
+    this.#messageBox = this.options.messageBox || document.querySelector(`div#message`);
+    this.#rowTemplate = document.querySelector(`template#RowTemplate`);
     this.#letterInputs = Array.from(document.querySelectorAll('.guess-letter'));
-    this.#lengthValue = document.getElementById('lengthValue');
-    this.#settingsDialog = document.getElementById('settingsDialog');
-    this.#settingsBtn = document.getElementById('SettingsButton');
-    this.#closeSettingsBtn = document.getElementById('closeSettings');
-    this.#timerSelect = document.getElementById('timerSelect');
+    this.#lengthValue = document.querySelector(`span#lengthValue`);
+    this.#settingsDialog = document.querySelector(`dialog#settingsDialog`);
+    this.#settingsBtn = document.querySelector(`button#SettingsButton`);
+    this.#closeSettingsBtn = document.querySelector(`button#closeSettings`);
+    this.#timerSelect = document.querySelector(`select#timerSelect`);
     this.#playerCountInputs = document.querySelectorAll('input[name="playerCount"]');
-    this.#turnIndicator = document.getElementById('turnIndicator');
+    this.#turnIndicator = document.querySelector(`div#turnIndicator`);
 
     if (
       !this.#board ||
@@ -146,13 +305,21 @@ class Wordley extends BaseClass {
     });
 
     this.#letterInputs.forEach((input) => {
-      this.addListener(input, 'tile-input', this.#handleLetterInput);
-      this.addListener(input, 'tile-keydown', this.#handleLetterKeydown);
+      this.addListener(input, 'tile-input', (event) => {
+        this.#handleLetterInput(/** @type {TileInputEvent} */(event));
+      });
+      this.addListener(input, 'tile-keydown', (event) => {
+        this.#handleLetterKeydown(/** @type {TileKeydownEvent} */(event));
+      });
     });
 
     this.#focusFirstLetter();
   }
 
+  /**
+   * 
+   * @param {string|number} length 
+   */
   async #applyLength(length) {
     this.#wordLength = Number(length) || 5;
     const baseRows = Math.max(6, this.#wordLength + 1);
@@ -193,6 +360,9 @@ class Wordley extends BaseClass {
   }
 
   #buildBoard() {
+    if (!this.#board) {
+      return;
+    }
     const turnIndicator = this.#turnIndicator;
     this.#board.innerHTML = '';
     if (turnIndicator) {
@@ -203,9 +373,11 @@ class Wordley extends BaseClass {
 
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < this.#maxRows; i++) {
-      const clone = this.#rowTemplate.content.firstElementChild.cloneNode(true);
-      clone.dataset.row = String(i);
-      fragment.appendChild(clone);
+      const clone = validateTarget(this.#rowTemplate?.content.firstElementChild?.cloneNode(true), HTMLElement);
+      if (clone) {
+        clone.dataset.row = String(i);
+        fragment.appendChild(clone);
+      }
     }
     this.#board.appendChild(fragment);
   }
@@ -226,7 +398,10 @@ class Wordley extends BaseClass {
       const fragment = document.createDocumentFragment();
 
       arr.forEach((ch) => {
-        const tile = document.createElement('game-tile');
+        const tile = validateTarget(document.createElement('game-tile'), GameTile);
+        if (!tile) {
+          return;
+        }
         tile.classList.add('alpha-tile');
         tile.setAttribute('readonly', '');
         tile.value = ch;
@@ -274,13 +449,23 @@ class Wordley extends BaseClass {
     this.#setMessage(this.#remainingMessage(), 'info');
   }
 
+  /**
+   * 
+   * @param {number} length 
+   */
   #updateLengthValue(length) {
     if (this.#lengthValue) {
       this.#lengthValue.textContent = String(length);
     }
   }
 
-  #setMessage(text, tone = 'info') {
+  /**
+   * 
+   * @param {string} text 
+   * @param {string} status 
+   * @returns {void}
+   */
+  #setMessage(text, status = 'info') {
     if (!this.#messageBox) return;
     let content = text;
 
@@ -291,7 +476,7 @@ class Wordley extends BaseClass {
     }
     this.#messageBox.textContent = content;
     this.#messageBox.classList.remove('error', 'success', 'info');
-    this.#messageBox.classList.add('show', tone);
+    this.#messageBox.classList.add('show', status);
   }
 
   #updateTurnIndicator() {
@@ -323,6 +508,12 @@ class Wordley extends BaseClass {
     }
   }
 
+  /**
+   * 
+   * @param {string} letter 
+   * @param {keyof typeof STATUS_PRIORITY} status 
+   * @returns {void}
+   */
   #setLetterStatus(letter, status) {
     const upper = letter.toUpperCase();
     const current = this.#letterStatusMap.get(upper);
@@ -342,14 +533,23 @@ class Wordley extends BaseClass {
     }
   }
 
+  /**
+   * 
+   * @param {Event} event 
+   */
   #handleSubmit = async (event) => {
     event.preventDefault();
     await this.#makeGuess();
   };
 
+  /**
+   * 
+   * @param {Event} event 
+   */
   #handleLengthChange = async (event) => {
     try {
-      await this.#applyLength(event.target.value);
+      const target = validateTarget(event.target, HTMLSelectElement);
+      target && await this.#applyLength(target.value);
       this.#saveSettings();
     } catch (err) {
       console.error(err);
@@ -372,20 +572,36 @@ class Wordley extends BaseClass {
     this.#settingsDialog?.close();
   };
 
+  /**
+   * 
+   * @param {Event} event 
+   */
   #handleDialogBackdrop = (event) => {
     if (event.target === this.#settingsDialog) {
       this.#closeSettings();
     }
   };
 
+  /**
+   * 
+   * @param {Event} event 
+   */
   #handleTimerChange = (event) => {
-    this.#timerDuration = parseInt(event.target.value, 10) || 0;
-    this.#resetTimer();
-    this.#saveSettings();
+    const target = validateTarget(event.target, HTMLSelectElement);
+    if (target) {
+      this.#timerDuration = parseInt(target.value, 10) || 0;
+      this.#resetTimer();
+      this.#saveSettings();
+    }
   };
 
+  /**
+   * 
+   * @param {Event} event 
+   */
   #handlePlayerCountChange = async (event) => {
-    const newCount = parseInt(event.target.value, 10) || 1;
+    const target = validateTarget(event.target, HTMLInputElement);
+    const newCount = target ? parseInt(target.value, 10) || 1 : this.#playerCount;
     if (newCount !== this.#playerCount) {
       this.#playerCount = newCount;
       this.#saveSettings();
@@ -409,7 +625,7 @@ class Wordley extends BaseClass {
 
         if (settings.playerCount) {
           this.#playerCount = settings.playerCount;
-          this.#playerCountInputs.forEach((input) => {
+          this.#playerCountInputs?.forEach((input) => {
             input.checked = parseInt(input.value, 10) === settings.playerCount;
           });
         }
@@ -497,8 +713,12 @@ class Wordley extends BaseClass {
       }
       const tiles = Array.from(rowEl.querySelectorAll('.tiles game-tile'));
       tiles.slice(0, this.#wordLength).forEach((tile) => {
-        tile.value = '';
-        tile.status = 'absent';
+        const gameTile = validateTarget(tile, GameTile);
+        if (!gameTile) {
+          return;
+        }
+        gameTile.value = '';
+        gameTile.status = 'absent';
       });
     }
 
@@ -514,7 +734,7 @@ class Wordley extends BaseClass {
     this.#focusFirstLetter();
 
     if (this.#row >= this.#maxRows) {
-      this.#recordStat(this.#wordLength, 'failed');
+      this.#recordSinglePlayerStat(this.#wordLength, 'failed');
       this.#setMessage(`Out of guesses! The word was ${this.#secret.toUpperCase()}.`, 'error');
       this.#endGame();
     } else {
@@ -529,6 +749,10 @@ class Wordley extends BaseClass {
     }
   }
 
+  /**
+   * 
+   * @param {TileInputEvent} event 
+   */
   #handleLetterInput = (event) => {
     const { value, index } = event.detail;
 
@@ -545,6 +769,10 @@ class Wordley extends BaseClass {
     this.#updateRemainingMessage();
   };
 
+  /**
+   * 
+   * @param {TileKeydownEvent} event 
+   */
   #handleLetterKeydown = (event) => {
     const { key, index, originalEvent } = event.detail;
     const input = this.#letterInputs[index];
@@ -610,10 +838,15 @@ class Wordley extends BaseClass {
       return;
     }
 
-    const rowEl = this.#board?.querySelector(`.row[data-row='${this.#row}']`);
-    /* c8 ignore next */
+    const rowEl = validateTarget(this.#board?.querySelector(`.row[data-row='${this.#row}']`), HTMLElement);
+
+    if (!rowEl) return;
+
     const tiles = rowEl
-      ? Array.from(rowEl.querySelectorAll('.tiles game-tile')).slice(0, this.#wordLength)
+      ? Array.from(rowEl.querySelectorAll('.tiles game-tile'))
+        .slice(0, this.#wordLength)
+        .map((tile) => validateTarget(tile, GameTile))
+        .filter(tile => tile !== false)
       : [];
 
     if (this.#playerCount === 2 && rowEl) {
@@ -621,24 +854,30 @@ class Wordley extends BaseClass {
     }
 
     this.#scoreGuess(guess, tiles);
-    /* c8 ignore next */
+
     this.#displayDefinition(guess, rowEl || null);
 
-    const isWin = guess === this.#secret;
-    const isLoss = this.#row === this.#maxRows - 1;
+    this.#row++;
+
+    const isWin =
+      guess === this.#secret &&
+      this.#row <= this.#maxRows;
+    const isLoss = this.#row >= this.#maxRows;
 
     if (isWin) {
       this.#winner = this.#currentPlayer;
-      this.#recordStat(this.#wordLength, this.#row + 1);
+      if (this.#playerCount === 2) {
+        this.#recordTwoPlayerStat(this.#wordLength, this.#winner);
+      } else if (this.#row === 1 || this.#row === 2 || this.#row === 3 || this.#row === 4 || this.#row === 5 || this.#row === 6) {
+        this.#recordSinglePlayerStat(this.#wordLength, this.#row);
+      }
       this.#setMessage(`You win! The word was ${this.#secret.toUpperCase()}.`, 'success');
       this.#endGame();
     } else if (isLoss) {
-      this.#recordStat(this.#wordLength, 'failed');
+      this.#recordSinglePlayerStat(this.#wordLength, 'failed');
       this.#setMessage(`Out of guesses! The word was ${this.#secret.toUpperCase()}.`, 'error');
       this.#endGame();
     }
-
-    this.#row++;
 
     if (this.#playerCount === 2 && !isWin && !isLoss) {
       this.#currentPlayer = this.#currentPlayer === 1 ? 2 : 1;
@@ -654,6 +893,11 @@ class Wordley extends BaseClass {
     this.#focusFirstLetter();
   }
 
+  /**
+   * 
+   * @param {string} guess 
+   * @param {GameTile[]} tiles 
+   */
   #scoreGuess(guess, tiles) {
     const secretArr = this.#secret.split('');
     const guessArr = guess.split('');
@@ -666,22 +910,22 @@ class Wordley extends BaseClass {
         tiles[i].setAttribute('aria-label', `${letter}, correct`);
         this.#setLetterStatus(guess[i], 'correct');
         this.#correctPositions[i] = letter;
-        secretArr[i] = null;
-        guessArr[i] = null;
+        secretArr[i] = '';
+        guessArr[i] = '';
       }
     }
 
     this.#updateInputPlaceholders();
 
     for (let i = 0; i < this.#wordLength; i++) {
-      if (guessArr[i] === null) continue;
+      if (guessArr[i] === '') continue;
 
       const letter = guessArr[i].toUpperCase();
       const idx = secretArr.indexOf(guessArr[i]);
       if (idx !== -1) {
         tiles[i].status = 'present';
         tiles[i].setAttribute('aria-label', `${letter}, present in word`);
-        secretArr[idx] = null;
+        secretArr[idx] = '';
         this.#setLetterStatus(guessArr[i], 'present');
       } else {
         tiles[i].status = 'absent';
@@ -691,6 +935,12 @@ class Wordley extends BaseClass {
     }
   }
 
+  /**
+   * 
+   * @param {string} word 
+   * @param {HTMLElement} rowEl 
+   * @returns 
+   */
   async #displayDefinition(word, rowEl) {
     if (!rowEl) return;
 
@@ -698,7 +948,7 @@ class Wordley extends BaseClass {
     if (definitions && definitions.length > 0) {
       const htmlRowEl = rowEl;
       const tooltipId = `tooltip-${htmlRowEl.dataset.row}-${Date.now()}`;
-      
+
       rowEl.setAttribute('aria-describedby', tooltipId);
 
       htmlRowEl.dataset.tooltip = definitions
@@ -725,17 +975,48 @@ class Wordley extends BaseClass {
     if (this.#button) this.#button.disabled = true;
     if (this.#resetButton) {
       setTimeout(() => {
-        this.#resetButton.focus();
+        this.#resetButton?.focus();
       }, 100);
     }
     this.#updateTurnIndicator();
   }
 
   #loadStats() {
-    return this.settingsService.wordley_stats || this.#createEmptyStats();
+    const storedStats = this.settingsService.wordley_stats;
+    const stats = this.#createEmptyStats();
+
+    if (!storedStats || typeof storedStats !== 'object') {
+      return stats;
+    }
+
+    if (storedStats.singlePlayer && typeof storedStats.singlePlayer === 'object') {
+      Object.assign(stats.singlePlayer, storedStats.singlePlayer);
+    } else {
+      Object.assign(stats.singlePlayer, storedStats);
+    }
+
+    if (storedStats.twoPlayer && typeof storedStats.twoPlayer === 'object') {
+      const { player1, player2, draws } = storedStats.twoPlayer;
+      if (player1 && typeof player1 === 'object') {
+        Object.assign(stats.twoPlayer.player1, player1);
+      }
+      if (player2 && typeof player2 === 'object') {
+        Object.assign(stats.twoPlayer.player2, player2);
+      }
+      if (draws && typeof draws === 'object') {
+        Object.assign(stats.twoPlayer.draws, draws);
+      }
+    }
+
+    return stats;
   }
 
+  /**
+   * 
+   * @returns {import('/scripts/settings').WordleyStats}
+   */
   #createEmptyStats() {
+    /** @type {import('/scripts/settings').WordleyStats} */
     const stats = {
       singlePlayer: {},
       twoPlayer: {
@@ -757,39 +1038,45 @@ class Wordley extends BaseClass {
     this.settingsService.wordley_stats = this.#stats;
   }
 
-  #recordStat(wordLength, guesses) {
+  /**
+   * 
+   * @param {number} wordLength 
+   * @param {1|2|3|4|5|6|'failed'} guesses 
+   */
+  #recordSinglePlayerStat(wordLength, guesses) {
     this.#ensureStatsStructure(wordLength);
 
-    if (this.#playerCount === 1) {
-      const key = guesses === 'failed' ? 'failed' : guesses;
-      /* c8 ignore next */
-      if (this.#stats.singlePlayer[wordLength][key] !== undefined) {
-        this.#stats.singlePlayer[wordLength][key]++;
-      }
-    } else {
-      if (this.#winner === 1) {
-        this.#stats.twoPlayer.player1[wordLength].wins++;
-        this.#stats.twoPlayer.player2[wordLength].losses++;
-      } else if (this.#winner === 2) {
-        this.#stats.twoPlayer.player2[wordLength].wins++;
-        this.#stats.twoPlayer.player1[wordLength].losses++;
-      } else {
-        this.#stats.twoPlayer.draws[wordLength]++;
-      }
+    if (this.#stats.singlePlayer[wordLength][guesses] !== undefined) {
+      this.#stats.singlePlayer[wordLength][guesses]++;
     }
     this.#saveStats();
   }
 
-  #ensureStatsStructure(wordLength) {
-    if (!this.#stats.singlePlayer) {
-      const oldStats = this.#stats;
-      this.#stats = this.#createEmptyStats();
-      for (let len = 4; len <= 6; len++) {
-        if (oldStats[len]) {
-          this.#stats.singlePlayer[len] = oldStats[len];
-        }
-      }
+  /**
+   * 
+   * @param {number} wordLength 
+   * @param {1|2|null} winner 1 for player 1 win, 2 for player 2 win, null for draw.
+   */
+  #recordTwoPlayerStat(wordLength, winner) {
+    this.#ensureStatsStructure(wordLength);
+
+    if (winner === 1) {
+      this.#stats.twoPlayer.player1[wordLength].wins++;
+      this.#stats.twoPlayer.player2[wordLength].losses++;
+    } else if (winner === 2) {
+      this.#stats.twoPlayer.player2[wordLength].wins++;
+      this.#stats.twoPlayer.player1[wordLength].losses++;
+    } else {
+      this.#stats.twoPlayer.draws[wordLength]++;
     }
+    this.#saveStats();
+  }
+
+  /**
+   * 
+   * @param {number} wordLength 
+   */
+  #ensureStatsStructure(wordLength) {
     if (!this.#stats.singlePlayer[wordLength]) {
       this.#stats.singlePlayer[wordLength] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, failed: 0 };
     }
@@ -804,6 +1091,12 @@ class Wordley extends BaseClass {
     }
   }
 
+  /**
+   * Returns persisted statistics for a mode and optional word length.
+    * @param {'singlePlayer'|'twoPlayer'|string} mode Statistics mode to read.
+    * @param {number} [wordLength] Optional word length to filter by.
+    * @returns {object} Statistics for the requested mode and word length.
+   */
   getStats(mode, wordLength) {
     if (!this.#stats.singlePlayer) {
       this.#ensureStatsStructure(4);
@@ -833,4 +1126,4 @@ class Wordley extends BaseClass {
 
 export { Wordley };
 
-    const game = new Wordley();
+const game = new Wordley();
