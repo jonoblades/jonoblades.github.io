@@ -91,9 +91,32 @@ describe('Player', () => {
 
     expect(() => player.render(null, 2, { selection: { hasMeldTile: () => false }, isCurrent: false })).not.toThrow();
   });
+
+  it('keeps valid partial meld removals, rejects invalid ones, and permits empty melds', async () => {
+    const player = new Player(0);
+    await player.addMeld([T('blue', 1, 'a'), T('blue', 2, 'b'), T('blue', 3, 'c'), T('blue', 4, 'd')]);
+
+    expect(await player.removeTilesFromMeld(0, ['d'])).toBe(true);
+    expect(player.playedMelds[0].map((tile) => tile.id)).toEqual(['a', 'b', 'c']);
+    expect(await player.removeTilesFromMeld(0, ['b'])).toBe(false);
+    expect(player.playedMelds[0]).toHaveLength(3);
+    expect(await player.removeTilesFromMeld(0, ['a', 'b', 'c'])).toBe(true);
+    expect(player.playedMelds[0]).toEqual([]);
+  });
 });
 
 describe('Futile UI wiring', () => {
+  it('initializes safely without optional board, dialog, or settings controls', async () => {
+    document.body.innerHTML = '<span id="message"></span>';
+    const game = new Futile(2, 0);
+
+    await game._ready();
+
+    expect(game.players).toHaveLength(2);
+    expect(game.eventListeners).toHaveLength(0);
+    expect(document.getElementById('message').textContent).toContain('Draw pile:');
+  });
+
   it('loads settings, wires dialogs, validates passing, delegates rack clicks, and tears down listeners', async () => {
     vi.useFakeTimers();
     localStorage.setItem('futile_settings', JSON.stringify({ playerCount: 4, difficulty: 'hard' }));
@@ -162,6 +185,85 @@ describe('Futile UI wiring', () => {
     expect([...document.querySelectorAll('.player-area')].map((area) => area.style.display))
       .toEqual(['', '', '', 'none']);
   });
+
+  it('reports failed delegated meld actions and renders after successful actions', async () => {
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    const createMeld = vi.spyOn(game, 'createMeld');
+    const addToMeld = vi.spyOn(game, 'addToMeld');
+    const checkForWin = vi.spyOn(game, 'checkForWin').mockReturnValue(false);
+    const renderAllHands = vi.spyOn(game, 'renderAllHands');
+
+    createMeld.mockResolvedValueOnce({ ok: false, reason: 'empty' });
+    document.getElementById('meldButton').click();
+    await vi.waitFor(() => expect(document.getElementById('message').textContent)
+      .toBe('Select tiles from your hand or a meld first.'));
+
+    createMeld.mockResolvedValueOnce({ ok: true });
+    document.getElementById('meldButton').click();
+    await vi.waitFor(() => expect(checkForWin).toHaveBeenCalledOnce());
+    expect(renderAllHands).toHaveBeenCalled();
+
+    const addButton = document.createElement('button');
+    addButton.dataset.addMeld = '';
+    addButton.dataset.owner = '0';
+    addButton.dataset.meldIdx = '0';
+    document.querySelector('.player-area').appendChild(addButton);
+
+    addToMeld.mockResolvedValueOnce({ ok: false, reason: 'no-dest' });
+    addButton.click();
+    await vi.waitFor(() => expect(document.getElementById('message').textContent)
+      .toBe('That destination meld no longer exists.'));
+
+    addToMeld.mockResolvedValueOnce({ ok: true });
+    addButton.click();
+    await vi.waitFor(() => expect(checkForWin).toHaveBeenCalledTimes(2));
+  });
+
+  it('ignores invalid settings input and only closes dialogs from their backdrops', async () => {
+    document.body.innerHTML = futileMarkup();
+    const helpDialog = document.getElementById('helpDialog');
+    const settingsDialog = document.getElementById('settingsDialog');
+    helpDialog.showModal = vi.fn();
+    helpDialog.close = vi.fn();
+    settingsDialog.close = vi.fn();
+    settingsDialog.showModal = vi.fn();
+    const invalidPlayerCount = document.createElement('input');
+    invalidPlayerCount.name = 'playerCount';
+    invalidPlayerCount.value = 'not-a-number';
+    settingsDialog.appendChild(invalidPlayerCount);
+    const game = new Futile(2, 0);
+    await game._ready();
+
+    document.getElementById('helpBtn').click();
+    helpDialog.querySelector('button').click();
+    expect(helpDialog.close).toHaveBeenCalledOnce();
+    helpDialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(helpDialog.close).toHaveBeenCalledTimes(2);
+
+    document.getElementById('SettingsButton').click();
+    expect(settingsDialog.showModal).toHaveBeenCalledOnce();
+    settingsDialog.querySelector('button').click();
+    expect(settingsDialog.close).toHaveBeenCalledOnce();
+    settingsDialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(settingsDialog.close).toHaveBeenCalledTimes(2);
+
+    invalidPlayerCount.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(game.players).toHaveLength(2);
+  });
+});
+
+describe('game-over action guards', () => {
+  it('rejects meld actions after a winner has been declared', async () => {
+    const game = new Futile(2, 0);
+
+    expect(game.checkForWin()).toBe(true);
+    expect(await game.createMeld({ handTileIds: [] })).toEqual({ ok: false, reason: 'game-over' });
+    expect(await game.addToMeld({ targetOwner: 0, targetMeldIdx: 0, handTileIds: [] }))
+      .toEqual({ ok: false, reason: 'game-over' });
+    expect(game.checkForWin()).toBe(false);
+  });
 });
 
 describe('createMeld', () => {
@@ -186,6 +288,16 @@ describe('createMeld', () => {
     const res = await g.createMeld({ handTileIds: ['a', 'b'] });
     expect(res).toEqual({ ok: false, reason: 'invalid-meld' });
     expect(p.playedMelds).toHaveLength(0);
+  });
+
+  it('reports an add failure when the player cannot store a valid meld', async () => {
+    const game = new Futile(2, 0);
+    const player = game.players[0];
+    ['a', 'b', 'c'].forEach((id, index) => player.receiveTile(T(['blue', 'red', 'green'][index], 6, id)));
+    vi.spyOn(player, 'addMeld').mockResolvedValue(false);
+
+    expect(await game.createMeld({ handTileIds: ['a', 'b', 'c'] }))
+      .toEqual({ ok: false, reason: 'add-failed' });
   });
 });
 
@@ -291,6 +403,52 @@ describe('addToMeld', () => {
     expect(await g.addToMeld({ targetOwner: 0, targetMeldIdx: 0, handTileIds: ['h1'] }))
       .toEqual({ ok: false, reason: 'dest-number' });
   });
+
+  it('requires a hand tile and preserves valid sources when moving meld tiles', async () => {
+    const game = new Futile(2, 0);
+    const current = game.players[0];
+    const source = game.players[1];
+    await current.addMeld([T('blue', 7, 'd1'), T('red', 7, 'd2'), T('green', 7, 'd3')]);
+    await source.addMeld([T('blue', 1, 's1'), T('blue', 2, 's2'), T('blue', 3, 's3')]);
+
+    expect(await game.addToMeld({
+      targetOwner: 0,
+      targetMeldIdx: 0,
+      meldTileIds: ['s1', 's2', 's3'],
+    })).toEqual({ ok: false, reason: 'need-hand-tile' });
+    expect(source.playedMelds[0]).toHaveLength(3);
+  });
+
+  it('rejects invalid source removals and malformed destinations', async () => {
+    const game = new Futile(2, 0);
+    const current = game.players[0];
+    const source = game.players[1];
+    await current.addMeld([T('blue', 7, 'd1'), T('red', 7, 'd2'), T('green', 7, 'd3')]);
+    current.receiveTile(T('amber', 7, 'h1'));
+    await source.addMeld([T('blue', 1, 's1'), T('blue', 2, 's2'), T('blue', 3, 's3')]);
+
+    expect(await game.addToMeld({
+      targetOwner: 0,
+      targetMeldIdx: 0,
+      handTileIds: ['h1'],
+      meldTileIds: ['s2'],
+    })).toEqual({ ok: false, reason: 'source-invalid' });
+
+    current.playedMelds.push([T('blue', 1, 'bad1'), T('red', 2, 'bad2'), T('green', 3, 'bad3')]);
+    expect(await game.addToMeld({ targetOwner: 0, targetMeldIdx: 1, handTileIds: ['h1'] }))
+      .toEqual({ ok: false, reason: 'dest-invalid' });
+  });
+
+  it('reports an add failure when updating a valid destination fails', async () => {
+    const game = new Futile(2, 0);
+    const player = game.players[0];
+    await player.addMeld([T('blue', 7, 'm1'), T('red', 7, 'm2'), T('green', 7, 'm3')]);
+    player.receiveTile(T('amber', 7, 'h1'));
+    vi.spyOn(player, 'updateMeld').mockResolvedValue(false);
+
+    expect(await game.addToMeld({ targetOwner: 0, targetMeldIdx: 0, handTileIds: ['h1'] }))
+      .toEqual({ ok: false, reason: 'add-failed' });
+  });
 });
 
 describe('checkForWin', () => {
@@ -322,6 +480,154 @@ describe('AIPlayer drives the public API', () => {
 
     expect(ai.playedMelds[0].map((t) => t.number)).toEqual([7, 7, 7]);
     expect(g.currentPlayer).toBe(0);
+  });
+
+  it('prefers a direct run when it is stronger than a set', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'easy',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn().mockResolvedValue({ ok: true }),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    ['r1', 'r2', 'r3', 'r4', 's1', 's2', 's3'].forEach((id, index) => {
+      const number = index < 4 ? index + 1 : 8;
+      const colour = index < 4 ? 'blue' : ['red', 'green', 'amber'][index - 4];
+      game.players[1].receiveTile(T(colour, number, id));
+    });
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.createMeld).toHaveBeenCalledWith({ handTileIds: ['r1', 'r2', 'r3', 'r4'] });
+    expect(game.checkForWin).toHaveBeenCalledOnce();
+    expect(game.endTurn).toHaveBeenCalledWith('r1');
+  });
+
+  it('passes after a rejected direct meld on easy difficulty', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'easy',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn().mockResolvedValue({ ok: false }),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    ['a', 'b', 'c'].forEach((id, index) => game.players[1].receiveTile(T('blue', index + 1, id)));
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.createMeld).toHaveBeenCalledOnce();
+    expect(game.checkForWin).not.toHaveBeenCalled();
+    expect(game.endTurn).toHaveBeenCalledWith('a');
+  });
+
+  it('falls back to an empty pass when a hard bot has no hand or meld', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'hard',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn(),
+      addToMeld: vi.fn(),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.createMeld).not.toHaveBeenCalled();
+    expect(game.addToMeld).not.toHaveBeenCalled();
+    expect(game.endTurn).toHaveBeenCalledWith(null);
+  });
+
+  it('skips medium extensions until the bot has played a meld', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'medium',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn(),
+      addToMeld: vi.fn(),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    game.players[1].receiveTile(T('red', 3, 'r3'));
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.addToMeld).not.toHaveBeenCalled();
+    expect(game.endTurn).toHaveBeenCalledWith('r3');
+  });
+
+  it('skips steals that cannot form a meld', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'hard',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn(),
+      addToMeld: vi.fn(),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    await game.players[0].addMeld([T('blue', 4, 'm4'), T('blue', 5, 'm5'), T('blue', 6, 'm6')]);
+    game.players[1].receiveTile(T('blue', 1, 'h1'));
+    game.players[1].receiveTile(T('blue', 2, 'h2'));
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.createMeld).not.toHaveBeenCalled();
+    expect(game.endTurn).toHaveBeenCalledWith('h1');
+  });
+
+  it('does not steal from a source meld that would become invalid', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'hard',
+      players: [new Player(0), new Player(1)],
+      createMeld: vi.fn(),
+      addToMeld: vi.fn(),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    await game.players[0].addMeld([T('blue', 3, 'm3'), T('blue', 4, 'm4'), T('blue', 5, 'm5')]);
+    game.players[1].receiveTile(T('blue', 1, 'h1'));
+    game.players[1].receiveTile(T('blue', 2, 'h2'));
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.createMeld).not.toHaveBeenCalled();
+    expect(game.endTurn).toHaveBeenCalledWith('h1');
+  });
+
+  it('extends the lower end of an existing run', async () => {
+    vi.useFakeTimers();
+    const game = {
+      difficulty: 'medium',
+      players: [new Player(0), new Player(1)],
+      addToMeld: vi.fn().mockResolvedValue({ ok: true }),
+      checkForWin: vi.fn(),
+      endTurn: vi.fn(),
+    };
+    await game.players[0].addMeld([T('green', 3, 'm3'), T('green', 4, 'm4'), T('green', 5, 'm5')]);
+    await game.players[1].addMeld([T('red', 1, 'o1'), T('red', 2, 'o2'), T('red', 3, 'o3')]);
+    game.players[1].receiveTile(T('green', 2, 'h2'));
+
+    const turn = new AIPlayer(1).takeTurn(game);
+    await vi.runAllTimersAsync();
+    await turn;
+
+    expect(game.addToMeld).toHaveBeenCalledWith({ targetOwner: 0, targetMeldIdx: 0, handTileIds: ['h2'] });
   });
 
   it('passes the lowest tile when it cannot play a meld', async () => {
@@ -433,5 +739,29 @@ describe('AIPlayer drives the public API', () => {
     expect(game.createMeld).toHaveBeenCalledWith({ handTileIds: ['h1', 'h2'], meldTileIds: ['x1'] });
     expect(game.checkForWin).toHaveBeenCalled();
     expect(game.endTurn).toHaveBeenCalledWith('h1');
+  });
+});
+
+describe('turn flow and bot rendering', () => {
+  it('masks a bot hand and applies queued passes after a full round', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup(2);
+    const game = new Futile(2, 0);
+    await game._ready();
+
+    const firstTileId = game.players[0].hand[0].id;
+    game.currentPlayer = 1;
+    game.renderAllHands();
+    expect(document.querySelectorAll('#tileRack game-tile[aria-hidden="true"]'))
+      .toHaveLength(game.players[1].hand.length);
+
+    game.currentPlayer = 0;
+    game.renderAllHands();
+    document.querySelector(`#tileRack game-tile[data-id="${firstTileId}"]`).click();
+    await game.endTurn();
+    await game.endTurn(game.players[1].hand[0].id);
+
+    expect(game.currentPlayer).toBe(0);
+    expect(game.players[1].hand.some((tile) => tile.id === firstTileId)).toBe(true);
   });
 });

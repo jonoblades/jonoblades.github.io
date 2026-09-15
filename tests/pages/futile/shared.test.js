@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isSet, isRun, isValidMeld, compareTiles } from '../../../games/futile/shared.js';
+import { isSet, isRun, isValidMeld, compareTiles, validateTarget } from '../../../games/futile/shared.js';
 
 const tile = (colour, number, id = `${colour}-${number}-${Math.random()}`) => ({ id, colour, number });
 
@@ -47,5 +47,14 @@ describe('compareTiles', () => {
     const c = tile('blue', 3, 'c');
     const sorted = [c, a, b].sort(compareTiles);
     expect(sorted.map((t) => t.id)).toEqual(['b', 'a', 'c']);
+  });
+});
+
+describe('validateTarget', () => {
+  it('uses Element as its default target type', () => {
+    const element = document.createElement('div');
+
+    expect(validateTarget(element)).toBe(element);
+    expect(validateTarget(null)).toBe(false);
   });
 });
