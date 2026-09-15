@@ -421,6 +421,12 @@ dialog {
     line-height: 1;
     border-left: none;
     border-bottom-right-radius: var(--spacing-standard);
+
+    &.parent-link {
+      border-bottom: 1px solid var(--border-colour);
+      border-right: 1px solid var(--border-colour);
+      margin-right: -1px;
+    }
   }
 
   .page-title {
