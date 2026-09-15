@@ -1,10 +1,33 @@
+/**
+ * Sudoku puzzle game controller.
+ * @module sudoku
+ */
 import BaseClass from "/scripts/BaseClass.js";
 
-class Sudoku extends BaseClass {
+/**
+ * Loads, renders, navigates, and validates Sudoku puzzles.
+ */
+export class Sudoku extends BaseClass {
+  /**
+   * Editable and fixed cells in the Sudoku grid.
+   * @type {NodeListOf<HTMLElement>}
+   */
   #grid;
+  /**
+   * Puzzles loaded from the puzzle data file.
+   * @type {{ id: number, difficulty: string, puzzle: number[][], solution: number[][] }[]}
+   */
   #puzzles = [];
+  /**
+   * Puzzle currently shown to the player.
+   * @type {{ id: number, difficulty: string, puzzle: number[][], solution: number[][] }|undefined}
+   */
   #selectedPuzzle;
 
+  /**
+   * Creates and initializes the Sudoku game.
+    * @returns {void}
+   */
   constructor() {
     super();
     this.init(async () => { 
