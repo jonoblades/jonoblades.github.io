@@ -378,6 +378,101 @@ describe('Wordley page', () => {
     await vi.waitFor(() => expect(document.getElementById('message').textContent).toBe('6 guesses remaining'));
   });
 
+  it('handles settings backdrop clicks and ignores unchanged or invalid player counts', async () => {
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+    const settingsDialog = document.getElementById('settingsDialog');
+    settingsDialog.close = vi.fn();
+
+    settingsDialog.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(settingsDialog.close).toHaveBeenCalledOnce();
+
+    const singlePlayer = document.querySelector('input[value="1"]');
+    singlePlayer.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(document.querySelectorAll('#board .row')).toHaveLength(6);
+
+    singlePlayer.value = 'invalid';
+    singlePlayer.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(document.querySelectorAll('#board .row')).toHaveLength(6);
+  });
+
+  it('keeps keyboard focus stable when adjacent inputs are disabled', async () => {
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+    const inputs = [...document.querySelectorAll('.guess-letter')];
+    const originalEvent = { preventDefault: vi.fn() };
+
+    inputs[4].focus();
+    inputs[4].dispatchEvent(new CustomEvent('tile-keydown', {
+      bubbles: true,
+      detail: { key: 'ArrowRight', index: 4, originalEvent },
+    }));
+    expect(document.activeElement).toBe(inputs[4]);
+    expect(originalEvent.preventDefault).toHaveBeenCalledOnce();
+
+    inputs[0].value = '';
+    inputs[0].dispatchEvent(new CustomEvent('tile-keydown', {
+      bubbles: true,
+      detail: { key: 'Backspace', index: 0, originalEvent },
+    }));
+    expect(originalEvent.preventDefault).toHaveBeenCalledOnce();
+  });
+
+  it('updates timer progress across success, warning, and danger bands', async () => {
+    let timerCallback;
+    vi.spyOn(globalThis, 'setInterval').mockImplementation((callback) => {
+      timerCallback = callback;
+      return 1;
+    });
+    vi.spyOn(globalThis, 'clearInterval').mockImplementation(() => {});
+    localStorage.setItem('wordley_settings', JSON.stringify({ timerDuration: 15 }));
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+
+    document.querySelector('.guess-letter').dispatchEvent(new CustomEvent('tile-input', {
+      bubbles: true,
+      detail: { value: 'c', index: 0 },
+    }));
+    timerCallback();
+    expect(document.getElementById('message').style.getPropertyValue('--timer-color'))
+      .toBe('var(--colour-success)');
+    for (let tick = 0; tick < 7; tick++) timerCallback();
+    expect(document.getElementById('message').style.getPropertyValue('--timer-color'))
+      .toBe('var(--colour-warning)');
+    for (let tick = 0; tick < 4; tick++) timerCallback();
+    expect(document.getElementById('message').style.getPropertyValue('--timer-color'))
+      .toBe('var(--colour-danger)');
+  });
+
+  it('ignores submissions after a game has ended', async () => {
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+
+    await enterGuess('cigar');
+    const message = document.getElementById('message').textContent;
+    await enterGuess('crane');
+
+    expect(document.getElementById('message').textContent).toBe(message);
+    expect(document.querySelectorAll('.row[data-row="1"] game-tile[value]')).toHaveLength(0);
+  });
+
+  it('normalizes partial current-format statistics', async () => {
+    const loaded = await loadWordley();
+    const settings = (await import('../../../scripts/settings.js')).default;
+    settings.wordley_stats = {
+      singlePlayer: { 4: { 1: 3, failed: 1 } },
+      twoPlayer: { player1: { 4: { wins: 2, losses: 1 } } },
+    };
+    const game = new loaded.Wordley();
+
+    expect(game.getStats('singlePlayer', 4)).toMatchObject({ 1: 3, failed: 1 });
+    expect(game.getStats('twoPlayer', 4)).toMatchObject({
+      player1: { wins: 2, losses: 1 },
+      player2: { wins: 0, losses: 0 },
+      draws: 0,
+    });
+  });
+
   it('initializes with optional controls absent', async () => {
     document.getElementById('lengthSelect').remove();
     document.getElementById('resetGame').remove();

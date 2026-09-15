@@ -335,7 +335,7 @@ class GameTile extends HTMLElement {
       if (input) {
         input.placeholder = newValue || '';
       }
-    } else if (name === 'readonly' || name === 'disabled' || name === 'status' || name === 'selected') {
+    } else {
       this.#render();
     }
   }

@@ -23,6 +23,14 @@ describe('Selection', () => {
     expect(sel.meldTileIds).toEqual(['t2']);
   });
 
+  it('removes a meld tile when it is selected again', () => {
+    sel.toggleMeldTile('t2', 3, 1);
+    sel.toggleMeldTile('t2', 3, 1);
+
+    expect(sel.hasMeldTile('t2')).toBe(false);
+    expect(sel.meldTileCount).toBe(0);
+  });
+
   it('returns null when locating an unselected tile', () => {
     expect(sel.locate('nope')).toBeNull();
   });
