@@ -86,7 +86,7 @@ yarn test:coverage
 Coverage is collected with V8 and the configured minimum threshold is 80% for statements, branches, functions and
 lines. HTML coverage output is written to `coverage/`.
 
-![Coverage](https://codecov.io/gh/jonoblades/jonoblades.github.io/branch/main/svg)
+[![codecov](https://codecov.io/gh/jonoblades/jonoblades.github.io/graph/badge.svg?token=4MR3XADLM4)](https://codecov.io/gh/jonoblades/jonoblades.github.io)
 
 ## Project structure
 
