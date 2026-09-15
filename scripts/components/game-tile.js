@@ -5,7 +5,7 @@
  * @module game-tile
  */
 
-import { validateTarget } from "games/futile/shared";
+import { validateTarget } from '/games/futile/shared.js';
 
 /**
  * Visual states supported by a game tile.
@@ -520,7 +520,12 @@ class GameTile extends HTMLElement {
   }
 }
 
-customElements.define('game-tile', GameTile);
+if (!customElements.get('game-tile')) {
+  customElements.define('game-tile', GameTile);
+}
+
+/** @type {typeof GameTile} */
+const registeredGameTile = /** @type {typeof GameTile} */ (customElements.get('game-tile'));
 
 if (typeof window !== 'undefined') {
   /**
@@ -528,7 +533,7 @@ if (typeof window !== 'undefined') {
   * @type {Window & {GameTile?: typeof GameTile}}
    */
   const gameWindow = window;
-  gameWindow.GameTile = GameTile;
+  gameWindow.GameTile = registeredGameTile;
 }
 
-export default GameTile;
+export default registeredGameTile;

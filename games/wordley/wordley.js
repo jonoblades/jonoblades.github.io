@@ -5,7 +5,7 @@
  * localStorage persistence for settings and statistics.
  * @module game
  */
-import { validateTarget } from 'games/futile/shared';
+import { validateTarget } from '/games/futile/shared.js';
 import BaseClass from '/scripts/BaseClass.js';
 import definitionsService from '/scripts/DefinitionsService.js';
 import GameTile from '/scripts/components/game-tile';
@@ -240,8 +240,8 @@ class Wordley extends BaseClass {
     /* c8 ignore next */
     this.#button = this.options.button || (this.#form ? this.#form.querySelector(this.options.buttonSelector) : null);
     this.#resetButton = this.options.resetButton || document.querySelector(`button#${this.options.resetButtonId}`);
-    const alphaLeft = this.options.alphaLeft || document.querySelector(`div#${this.options.alphaLeftId}`);
-    const alphaRight = this.options.alphaRight || document.querySelector(`div#${this.options.alphaRightId}`);
+    const alphaLeft = this.options.alphaLeft || document.getElementById(this.options.alphaLeftId);
+    const alphaRight = this.options.alphaRight || document.getElementById(this.options.alphaRightId);
     if (!alphaLeft || !alphaRight) {
       throw new Error('Missing required alpha columns for the game.');
     }
@@ -982,7 +982,33 @@ class Wordley extends BaseClass {
   }
 
   #loadStats() {
-    return this.settingsService.wordley_stats || this.#createEmptyStats();
+    const storedStats = this.settingsService.wordley_stats;
+    const stats = this.#createEmptyStats();
+
+    if (!storedStats || typeof storedStats !== 'object') {
+      return stats;
+    }
+
+    if (storedStats.singlePlayer && typeof storedStats.singlePlayer === 'object') {
+      Object.assign(stats.singlePlayer, storedStats.singlePlayer);
+    } else {
+      Object.assign(stats.singlePlayer, storedStats);
+    }
+
+    if (storedStats.twoPlayer && typeof storedStats.twoPlayer === 'object') {
+      const { player1, player2, draws } = storedStats.twoPlayer;
+      if (player1 && typeof player1 === 'object') {
+        Object.assign(stats.twoPlayer.player1, player1);
+      }
+      if (player2 && typeof player2 === 'object') {
+        Object.assign(stats.twoPlayer.player2, player2);
+      }
+      if (draws && typeof draws === 'object') {
+        Object.assign(stats.twoPlayer.draws, draws);
+      }
+    }
+
+    return stats;
   }
 
   /**
