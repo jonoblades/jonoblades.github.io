@@ -8,7 +8,7 @@
 import { validateTarget } from '/games/futile/shared.js';
 import BaseClass from '/scripts/BaseClass.js';
 import definitionsService from '/scripts/DefinitionsService.js';
-import GameTile from '/scripts/components/game-tile';
+import GameTile from '/scripts/components/game-tile.js';
 
 /**
  * @typedef {object} WordleyOptions
