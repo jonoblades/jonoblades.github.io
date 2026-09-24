@@ -18,8 +18,9 @@ export default class Enhancements extends BaseClass {
   #initTableOfContents() {
     const toc = document.getElementById('TableOfContents');
     if (toc) {
+      const tocDetails = toc.closest('details');
       const titles = document.querySelectorAll('h2, h3');
-      if (titles.length > 3) {
+      if (titles.length > 3 || document.body.scrollHeight > (window.innerHeight * 1.5)) {
         titles.forEach(title => {
           if (!title.id) {
             const usedIds = new Set();
@@ -34,7 +35,6 @@ export default class Enhancements extends BaseClass {
           link.textContent = title.textContent;
           link.href = `#${title.id}`;
           this.addListener(link, 'click', () => {
-            const tocDetails = toc.closest('details');
             if (tocDetails) {
               tocDetails.open = false;
             }
@@ -45,7 +45,7 @@ export default class Enhancements extends BaseClass {
           }
           toc.appendChild(li);
         });
-        toc.classList.remove('hidden');
+        tocDetails?.classList.remove('hidden');
       }
     }
   }

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function loadEnhancements() {
   vi.resetModules();
-  const module = await import('../../scripts/enhancements.js');
+  const module = await import('../../scripts/Enhancements.js');
   return module.default;
 }
 
@@ -23,9 +23,9 @@ describe('Enhancements', () => {
   beforeEach(() => {
     document.head.innerHTML = '';
     document.body.innerHTML = `
-      <details open>
+      <details class="hidden" open>
         <summary>Table of Contents</summary>
-        <ul id="TableOfContents" class="hidden"></ul>
+        <ul id="TableOfContents"></ul>
       </details>
       <input id="ThemeToggle" type="checkbox">
       <button id="ShareButton" class="hidden">Share</button>
@@ -53,7 +53,7 @@ describe('Enhancements', () => {
     await initializeEnhancements(Enhancements);
 
     const links = [...document.querySelectorAll('#TableOfContents a')];
-    expect(document.querySelector('#TableOfContents').classList.contains('hidden')).toBe(false);
+    expect(document.querySelector('#TableOfContents').closest('details').classList.contains('hidden')).toBe(false);
     expect(links.map(link => [link.textContent, link.getAttribute('href')])).toEqual([
       ['Getting Started', '#getting-started'],
       ['First Steps', '#first-steps'],
@@ -90,7 +90,7 @@ describe('Enhancements', () => {
     localStorage.setItem('theme', JSON.stringify('other'));
     const Enhancements = await loadEnhancements();
 
-    const settings = (await import('../../scripts/settings.js')).default;
+    const settings = (await import('../../scripts/Settings.js')).default;
     settings.theme = 'other';
     await initializeEnhancements(Enhancements);
 

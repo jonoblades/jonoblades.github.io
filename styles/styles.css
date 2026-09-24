@@ -2,12 +2,14 @@
 
 @media (prefers-color-scheme: light) {
   html:has(#ThemeToggle:checked) {
+    color-scheme: dark;
     --colour-bg: var(--colour-dark-slate);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   html:has(#ThemeToggle:checked) {
+    color-scheme: light;
     --colour-bg: var(--colour-white);
   }
 }
@@ -16,6 +18,7 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  scrollbar-color: currentColor transparent;
 }
 
 html {
@@ -24,7 +27,32 @@ html {
   margin: 0;
   padding: 0;
   accent-color: var(--accent-colour);
+  color: var(--text-colour);
+  color-scheme: light dark;
   scroll-behavior: smooth;
+  scrollbar-width: auto;
+}
+
+/* Chromium and Safari scrollbar fallback. */
+*::-webkit-scrollbar {
+  width: 1rem;
+  height: 1rem;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 3rem;
+  border: 0.1875rem solid transparent;
+  border-radius: var(--radius-small);
+  background-clip: padding-box;
+  background-color: currentColor;
+}
+
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -58,6 +86,13 @@ body {
   align-items: center;
   justify-content: flex-start;
   background-color: var(--colour-bg);
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--colour-bg) 96%, var(--accent-colour) 4%),
+    var(--colour-bg) 55%,
+    color-mix(in oklab, var(--colour-bg) 98%, var(--heading-colour) 2%)
+  );
+  background-attachment: fixed;
 
   &:not(.js) {
     .js-only {
@@ -238,6 +273,44 @@ button {
     padding: 0;
     letter-spacing: normal;
     aspect-ratio: 1 / 1;
+  }
+}
+
+aside {
+  padding: var(--spacing-small) var(--spacing-standard);
+  border-left: 0.5rem solid var(--colour-info-border);
+  border-bottom-right-radius: var(--radius-standard);
+  font-size: 0.9em;
+  font-style: italic;
+  background-color: var(--colour-info-bg);
+  color: var(--colour-info-text);
+
+  &.right {
+    text-align: right;
+    border-left: none;
+    border-bottom-right-radius: 0;
+    border-right: 0.5rem solid var(--colour-info-border);
+    border-top-left-radius: var(--radius-standard);
+  }
+
+  &.note::before {
+    content: 'Note';
+  }
+
+  &.postscript::before {
+    content: 'Postscript';
+  }
+
+  &.footnote::before {
+    content: 'Footnote';
+  }
+
+  &::before {
+    content: 'Aside';
+    font-weight: 700;
+    font-style: normal;
+    display: block;
+    margin-bottom: var(--spacing-small);
   }
 }
 
@@ -463,30 +536,6 @@ dialog {
   color: var(--colour-bg);
   border-bottom-left-radius: var(--spacing-standard);
 
-  @media (prefers-color-scheme: light) {
-    &:active {
-      --colour-bg: var(--colour-dark-slate);
-      --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
-
-      &:has(input:checked) {
-        --colour-bg: var(--colour-white);
-        --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
-      }
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    &:active {
-      --colour-bg: var(--colour-white);
-      --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
-
-      &:has(input:checked) {
-        --colour-bg: var(--colour-dark-slate);
-        --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
-      }
-    }
-  }
-
   &:focus-within {
     outline: 3px solid var(--accent-colour);
     outline-offset: 4px;
@@ -583,6 +632,8 @@ dialog {
 }
 
 .t-o-c {
+  --contents-height: 500px;
+
   position: sticky;
   top: 0;
   margin-top: calc(-1 * var(--spacing-standard));
@@ -601,8 +652,9 @@ dialog {
 
   &[open] {
     &::details-content {
-      max-height: 500px;
+      max-height: var(--contents-height);
       opacity: 1;
+      overflow: hidden;
     }
 
     summary {
@@ -616,6 +668,11 @@ dialog {
     border-bottom-right-radius: var(--spacing-standard);
     cursor: pointer;
     transition: var(--default-transition);
+  }
+
+  nav {
+    max-height: var(--contents-height);
+    overflow: auto;
   }
 
   ul {
@@ -645,6 +702,8 @@ dialog {
 .hidden {
   display: none;
 }
+
+
 
 @media (min-width: 40.0625rem) {
   header address {
@@ -681,6 +740,16 @@ dialog {
 }
 
 @media (forced-colors: active) {
+  * {
+    scrollbar-color: auto;
+  }
+
+  *::-webkit-scrollbar-track,
+  *::-webkit-scrollbar-thumb,
+  *::-webkit-scrollbar-corner {
+    background-color: auto;
+  }
+
   .theme-toggle {
     border: 1px solid ButtonText;
   }

@@ -163,7 +163,7 @@ class Wordley extends BaseClass {
    */
   #maxRows;
   /**
-   * @type {import('/scripts/settings').WordleyStats}
+   * @type {import('../../scripts/Settings').WordleyStats}
    */
   #stats;
   /**
@@ -1013,10 +1013,10 @@ class Wordley extends BaseClass {
 
   /**
    * 
-   * @returns {import('/scripts/settings').WordleyStats}
+   * @returns {import('../../scripts/Settings').WordleyStats}
    */
   #createEmptyStats() {
-    /** @type {import('/scripts/settings').WordleyStats} */
+    /** @type {import('../../scripts/Settings').WordleyStats} */
     const stats = {
       singlePlayer: {},
       twoPlayer: {
