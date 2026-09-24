@@ -19,7 +19,7 @@ const defaultSettings = {
 
 async function loadSettingsService() {
   vi.resetModules();
-  const module = await import('../../scripts/settings.js');
+  const module = await import('../../scripts/Settings.js');
   return module.default;
 }
 

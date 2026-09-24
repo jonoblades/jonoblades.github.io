@@ -2,7 +2,7 @@
  * Shared lifecycle, settings, and event-listener management for page classes.
  * @module BaseClass
  */
-import settingsService from './settings.js';
+import settingsService from './Settings.js';
 
 /**
  * Shape of a tracked DOM event listener.

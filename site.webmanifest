@@ -1,0 +1,28 @@
+{
+  "name": "Jonathan Blades",
+  "short_name": "J. Blades",
+  "description": "Software developer, writer and maker based near Glasgow, Scotland.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdfcf9",
+  "theme_color": "#fdfcf9",
+  "icons": [
+    {
+      "src": "/assets/icons/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icons/favicon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icons/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

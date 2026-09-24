@@ -262,7 +262,7 @@ describe('Wordley page', () => {
     await enterGuess('crane');
     await vi.waitFor(() => expect(document.querySelector('.row[data-row="0"]').dataset.tooltip).toBeUndefined());
 
-    const settings = (await import('../../../scripts/settings.js')).default;
+    const settings = (await import('../../../scripts/Settings.js')).default;
     settings.wordley_stats = null;
     const game = new loaded.Wordley();
     expect(game.getStats('singlePlayer')).toHaveProperty('4');
@@ -458,7 +458,7 @@ describe('Wordley page', () => {
 
   it('normalizes partial current-format statistics', async () => {
     const loaded = await loadWordley();
-    const settings = (await import('../../../scripts/settings.js')).default;
+    const settings = (await import('../../../scripts/Settings.js')).default;
     settings.wordley_stats = {
       singlePlayer: { 4: { 1: 3, failed: 1 } },
       twoPlayer: { player1: { 4: { wins: 2, losses: 1 } } },

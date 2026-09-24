@@ -1,11 +1,13 @@
-import BaseClass from './BaseClass.js';
-import Enhancements from './enhancements.js';
+import Main from './Main.js';
 
-class Main extends BaseClass {
-  constructor() {    
-    super();
-    const enhancements = new Enhancements();
-  }
-}
+new Main();
 
 export default Main;
+
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', () => {
+		navigator.serviceWorker.register('/service-worker.js').catch(error => {
+			console.error('Service worker registration failed:', error);
+		});
+	});
+}
