@@ -38,7 +38,6 @@ body {
   flex-direction: column;
   gap: var(--spacing-small);
   align-items: stretch;
-  z-index: 1;
 }
 
 #board {

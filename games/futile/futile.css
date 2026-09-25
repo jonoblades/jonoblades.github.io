@@ -186,7 +186,6 @@ game-tile[pending-pass] {
   flex-direction: column;
   gap: var(--space-xs);
   align-items: stretch;
-  z-index: 1;
 }
 
 .board-play-area {
