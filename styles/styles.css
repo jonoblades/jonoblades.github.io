@@ -86,17 +86,21 @@ body {
   align-items: center;
   justify-content: flex-start;
   background-color: var(--colour-bg);
-  background-image: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--colour-bg) 96%, var(--accent-colour) 4%),
-    var(--colour-bg) 55%,
-    color-mix(in oklab, var(--colour-bg) 98%, var(--heading-colour) 2%)
-  );
+  background-image: linear-gradient(135deg,
+      color-mix(in oklab, var(--colour-bg) 96%, var(--accent-colour) 4%),
+      var(--colour-bg) 55%,
+      color-mix(in oklab, var(--colour-bg) 98%, var(--heading-colour) 2%));
   background-attachment: fixed;
 
   &:not(.js) {
     .js-only {
       display: none;
+    }
+
+    header {
+      padding-bottom: var(--spacing-standard);
+      margin-bottom: var(--spacing-standard);
+      border-bottom: 2px solid var(--border-colour);
     }
   }
 }
@@ -117,7 +121,6 @@ main {
   }
 }
 
-header,
 section {
   padding-bottom: var(--spacing-standard);
   margin-bottom: var(--spacing-standard);
@@ -411,7 +414,7 @@ dialog {
   anchor-scope: all;
 
   &::after {
-    z-index: 1;
+    z-index: 100;
     content: attr(data-tooltip);
     position: fixed;
     position-anchor: --tooltip-anchor;
@@ -473,6 +476,7 @@ dialog {
 }
 
 .site-title {
+
   position: fixed;
   top: 0;
   left: 0;
@@ -480,14 +484,16 @@ dialog {
   padding: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--colour-bg);
   font-weight: 700;
-  border: 1px solid var(--border-colour);
   border-bottom-right-radius: var(--spacing-standard);
+  align-items: flex-start;
+  z-index: 1;
+  pointer-events: none;
 
-  >* {
+  >*:not(:first-child) {
     height: max-content;
-    padding: var(--spacing-standard);
+    padding: var(--spacing-large) var(--spacing-standard) var(--spacing-standard);
+    margin-top: calc(var(--spacing-standard) * -1);
     display: flex;
     align-items: center;
     writing-mode: sideways-lr;
@@ -496,6 +502,8 @@ dialog {
     border-bottom-right-radius: var(--spacing-standard);
 
     &.parent-link {
+      pointer-events: auto;
+      width: var(--site-title-size);
       border-bottom: 1px solid var(--border-colour);
       border-right: 1px solid var(--border-colour);
       margin-right: -1px;
@@ -503,15 +511,81 @@ dialog {
   }
 
   .page-title {
+    width: var(--site-title-size);
     display: flex;
+    border-right: 1px solid var(--border-colour);
+    border-bottom: 1px solid var(--border-colour);
   }
 
   .site-title-link {
+    pointer-events: auto;
+    height: var(--site-title-size);
     width: max-content;
-    background-color: var(--colour-bg-contrast);
     color: var(--colour-bg);
     text-decoration: none;
     font-size: 1.5rem;
+    display: flex;
+    padding: 0;
+    border-radius: 0;
+    align-items: stretch;
+
+    writing-mode: unset;
+
+    &:hover {
+      .site-title-name {
+        max-width: 100%;
+        padding: 0 var(--spacing-standard);
+      }
+
+      span.logo {
+        transform: scale(1.5) rotate(0deg);
+      }
+    }
+
+    .logo-wrapper {
+      color: var(--colour-bg);
+      background-color: var(--colour-bg-contrast);
+      padding: var(--spacing-small);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: var(--site-title-size);
+      aspect-ratio: 1 / 1;
+      position: relative;
+      border: 1px solid var(--border-colour);
+    }
+
+    .site-title-name {
+      white-space: nowrap;
+      width: max-content;
+      max-width: 0;
+      background-color: var(--colour-bg-contrast);
+      transition: max-width 0.3s ease;
+      border-bottom-right-radius: var(--spacing-standard);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    span.logo {
+      font-size: var(--font-size-xlarge);
+      font-weight: bold;
+      transition: transform 0.3s ease;
+      aspect-ratio: 1 / 1;
+      transform: rotate(-90deg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &::before {
+        letter-spacing: -0.2em;
+        content: 'J';
+      }
+
+      &::after {
+        content: 'B';
+      }
+    }
   }
 }
 
@@ -542,16 +616,17 @@ dialog {
   }
 
   label {
-
-    padding: var(--spacing-standard);
+    height: var(--site-title-size);
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
 
     &::before,
     &::after {
-      width: var(--spacing-small);
-      height: calc(2 * var(--spacing-small));
+      width: var(--spacing-standard);
+      height: calc(2 * var(--spacing-standard));
       display: flex;
       border: 1px solid var(--colour-bg);
       content: '';
@@ -559,14 +634,14 @@ dialog {
 
     &::before {
       background-color: var(--colour-bg);
-      border-top-left-radius: var(--spacing-small);
-      border-bottom-left-radius: var(--spacing-small);
+      border-top-left-radius: var(--spacing-standard);
+      border-bottom-left-radius: var(--spacing-standard);
       border-right: none;
     }
 
     &::after {
-      border-top-right-radius: var(--spacing-small);
-      border-bottom-right-radius: var(--spacing-small);
+      border-top-right-radius: var(--spacing-standard);
+      border-bottom-right-radius: var(--spacing-standard);
       border-left: none;
     }
   }
@@ -636,13 +711,11 @@ dialog {
 
   position: sticky;
   top: 0;
-  margin-top: calc(-1 * var(--spacing-standard));
   display: flex;
   flex-direction: column;
   color: var(--colour-bg);
-  overflow: hidden;
   border-bottom-right-radius: var(--spacing-standard);
-  background: var(--colour-bg-contrast);
+  background: var(--heading-colour);
 
   &::details-content {
     opacity: 0;
@@ -659,15 +732,36 @@ dialog {
 
     summary {
       border-bottom-right-radius: 0;
+
+      &::before {
+        transform: rotate(90deg);
+      }
     }
   }
 
   summary {
-    background: var(--colour-bg-contrast);
-    padding: var(--spacing-standard);
+    padding: 0 var(--spacing-standard);
+    height: var(--site-title-size);
+    background: var(--heading-colour);
+    display: flex;
+    align-items: center;
     border-bottom-right-radius: var(--spacing-standard);
     cursor: pointer;
     transition: var(--default-transition);
+
+    &:focus {
+      outline: 2px solid var(--accent-colour);
+      outline-offset: 2px;
+    }
+
+    &::before {
+      content: '\25B6';
+      display: inline-block;
+      margin-right: var(--spacing-standard);
+      transition: var(--default-transition);
+    }
+
+
   }
 
   nav {
