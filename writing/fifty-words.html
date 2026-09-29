@@ -1,0 +1,27 @@
+---
+layout: default
+page_id: 50-words
+og_type: website
+title: 50 Words
+parent: 
+  - link: /writing
+    title: Writing
+heading: 50 Words
+description: >-
+  Stories by Jonathan Blades that are exactly, or just under, 50 words long.
+subtitle: Writing, stories and ideas
+tags_label: Writing interests
+tags:
+  - Fiction
+  - Technology
+  - Creativity
+rsslink: /fifty-words/feed.xml
+---
+{% for story in site.fifty-words reversed %}
+  <section>
+    <h2>{{ story.title }}</h2>
+    <div class="subtitle">{{ story.date | date: "%d %B %Y" }} - {{ story.word_count }} words</div>
+    {{ story.content }}
+  </section>
+{% endfor %}
+

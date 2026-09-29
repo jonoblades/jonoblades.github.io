@@ -35,6 +35,9 @@
     aria-label="Share this page">
     Share
   </button>
+  {% if page.rsslink %}
+    <a class="rss-link" href="{{ page.rsslink }}">Feed</a>
+  {% endif %}
   {% if include.showNavigation %}
   {% include navigation.html %}
   <div class="subtitle">
