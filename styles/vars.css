@@ -31,12 +31,12 @@
   --colour-bg: light-dark(var(--colour-white), var(--colour-dark-slate));
   --colour-bg-contrast: color-mix(in oklab, var(--colour-light-slate) 40%, contrast-color(var(--colour-bg)) 60%);
 
-  --colour-surface: color-mix(in oklab, var(--colour-bg) 90%, var(--colour-bg-contrast) 10%);
+  --colour-surface: color-mix(in oklab, var(--colour-navy), transparent 90%);
 
-  --text-colour: var(--colour-bg-contrast);
-  --heading-colour: color-mix(in oklab, var(--colour-navy) 55%, contrast-color(var(--colour-bg)) 45%);
-  --accent-colour: color-mix(in oklab, var(--colour-teal) 70%, contrast-color(var(--colour-bg)) 30%);
-  --border-colour: var(--colour-bg-contrast);
+  --colour-text: var(--colour-bg-contrast);
+  --colour-heading: color-mix(in oklab, var(--colour-navy) 55%, contrast-color(var(--colour-bg)) 45%);
+  --colour-accent: color-mix(in oklab, var(--colour-teal) 70%, contrast-color(var(--colour-bg)) 30%);
+  --colour-border: color-mix(in oklab, var(--colour-navy), transparent 50%);
 
   /* Semantic status colors, tinted with the main palette hues.
      -bg is a bold fill for tiles; -wash is a subtle tint for message banners. */

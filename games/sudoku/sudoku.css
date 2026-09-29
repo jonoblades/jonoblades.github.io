@@ -10,8 +10,8 @@
   grid-template-columns: repeat(9, auto);
   grid-template-rows: repeat(9, auto);
   gap: var(--spacing-standard);
-  column-rule: repeat(auto, none, none, 2px solid var(--border-colour));
-  row-rule: repeat(auto, none, none, 2px solid var(--border-colour));
+  column-rule: repeat(auto, none, none, 2px solid var(--colour-border));
+  row-rule: repeat(auto, none, none, 2px solid var(--colour-border));
 
   .cell {
     &:nth-child(3n) {

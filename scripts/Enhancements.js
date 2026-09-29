@@ -20,7 +20,8 @@ export default class Enhancements extends BaseClass {
     if (toc) {
       const tocDetails = toc.closest('details');
       const titles = document.querySelectorAll('h2, h3');
-      if (titles.length > 3 || document.body.scrollHeight > (window.innerHeight * 1.5)) {
+
+      if (titles.length >= 3) {
         titles.forEach(title => {
           if (!title.id) {
             const usedIds = new Set();
@@ -45,7 +46,15 @@ export default class Enhancements extends BaseClass {
           }
           toc.appendChild(li);
         });
-        tocDetails?.classList.remove('hidden');
+
+        const observer = new ResizeObserver(() => {
+          if (document.body.scrollHeight > (window.innerHeight * 1.5)) {
+            tocDetails?.classList.remove('hidden');
+          } else {
+            tocDetails?.classList.add('hidden');
+          }
+        });
+        observer.observe(document.body);
       }
     }
   }
@@ -74,8 +83,11 @@ export default class Enhancements extends BaseClass {
 
   #addThemeToggleListener() {
     const themeToggleCheckbox = document.getElementById('ThemeToggle');
+    if (!themeToggleCheckbox) {
+      return;
+    }
     this.addListener(themeToggleCheckbox, 'change', (ev) => {
-      this.settingsService.theme = ev.currentTarget.checked ? 'other' : 'system';
+      this.settingsService.theme = ev.currentTarget?.checked ? 'other' : 'system';
     });
     themeToggleCheckbox.checked = this.settingsService.theme === 'other';
   }
