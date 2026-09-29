@@ -47,6 +47,11 @@ export default class Enhancements extends BaseClass {
           toc.appendChild(li);
         });
 
+        tocDetails?.classList.remove('hidden');
+        if (typeof ResizeObserver === 'undefined') {
+          return;
+        }
+
         const observer = new ResizeObserver(() => {
           if (document.body.scrollHeight > (window.innerHeight * 1.5)) {
             tocDetails?.classList.remove('hidden');
