@@ -26,8 +26,8 @@ html {
   width: 100%;
   margin: 0;
   padding: 0;
-  accent-color: var(--accent-colour);
-  color: var(--text-colour);
+  accent-color: var(--colour-accent);
+  color: var(--colour-text);
   color-scheme: light dark;
   scroll-behavior: smooth;
   scrollbar-width: auto;
@@ -73,11 +73,12 @@ button {
   font-style: normal;
   line-height: 1.6;
   letter-spacing: 0.12em;
-  color: var(--text-colour, inherit);
+  color: var(--colour-text, inherit);
 }
 
 body {
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0 var(--spacing-xlarge);
   overflow: auto;
@@ -87,9 +88,9 @@ body {
   justify-content: flex-start;
   background-color: var(--colour-bg);
   background-image: linear-gradient(135deg,
-      color-mix(in oklab, var(--colour-bg) 96%, var(--accent-colour) 4%),
+      color-mix(in oklab, var(--colour-bg) 96%, var(--colour-accent) 4%),
       var(--colour-bg) 55%,
-      color-mix(in oklab, var(--colour-bg) 98%, var(--heading-colour) 2%));
+      color-mix(in oklab, var(--colour-bg) 98%, var(--colour-heading) 2%));
   background-attachment: fixed;
 
   &:not(.js) {
@@ -100,7 +101,7 @@ body {
     header {
       padding-bottom: var(--spacing-standard);
       margin-bottom: var(--spacing-standard);
-      border-bottom: 2px solid var(--border-colour);
+      border-bottom: 2px solid var(--colour-border);
     }
   }
 }
@@ -123,8 +124,8 @@ main {
 
 section {
   padding-bottom: var(--spacing-standard);
-  margin-bottom: var(--spacing-standard);
-  border-bottom: 2px solid var(--border-colour);
+  margin-bottom: var(--spacing-large);
+  border-bottom: 2px solid var(--colour-border);
 }
 
 header {
@@ -152,7 +153,7 @@ header {
       gap: var(--spacing-standard);
 
       a[aria-current='page'] {
-        color: var(--heading-colour);
+        color: var(--colour-heading);
         font-weight: 700;
         text-decoration-thickness: 0.15em;
         text-underline-offset: 0.25em;
@@ -162,11 +163,16 @@ header {
 }
 
 section {
-  &>article+article {
-    margin-top: var(--spacing-large);
+  h2 + article {
+    border-top: none;
+    padding-top: 0;
   }
 
   article {
+    border-top: 1px solid var(--colour-border);
+    margin-top: var(--spacing-standard);
+    padding-top: var(--spacing-small);
+
     ul {
       padding-inline-start: 1.4em;
 
@@ -187,7 +193,7 @@ h3 {
   margin: var(--spacing-standard) 0 var(--spacing-small);
   font-family: var(--font-family);
   line-height: 1.2;
-  color: var(--heading-colour);
+  color: var(--colour-heading);
 }
 
 h1 {
@@ -214,7 +220,7 @@ strong {
 }
 
 a {
-  color: var(--accent-colour);
+  color: var(--colour-accent);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
 
@@ -240,31 +246,27 @@ dl {
   }
 }
 
-blockquote {
-  margin-left: var(--spacing-standard);
-  padding-left: var(--spacing-standard);
-  border-left: 2px solid var(--accent-colour);
-  font-style: italic;
-}
-
-button {
+button,
+a.btn {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 48px;
+  width: max-content;
+  text-decoration: none;
   padding: var(--spacing-standard);
   background-color: transparent;
-  color: var(--text-colour);
+  color: var(--colour-text);
   font-family: var(--font-family);
   font-size: var(--font-size-standard);
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   border-radius: var(--spacing-small);
   cursor: pointer;
   transition: border-color var(--default-transition), color var(--default-transition);
 
   &:hover {
-    border-color: var(--accent-colour);
-    color: var(--accent-colour);
+    border-color: var(--colour-accent);
+    color: var(--colour-accent);
   }
 
   &:active {
@@ -279,14 +281,26 @@ button {
   }
 }
 
+blockquote,
 aside {
-  padding: var(--spacing-small) var(--spacing-standard);
-  border-left: 0.5rem solid var(--colour-info-border);
+  margin: 0;
+  padding: var(--spacing-standard) var(--spacing-large);
+  border-left: 2px solid var(--colour-accent);
   border-bottom-right-radius: var(--radius-standard);
-  font-size: 0.9em;
   font-style: italic;
-  background-color: var(--colour-info-bg);
-  color: var(--colour-info-text);
+  background-color: var(--colour-surface);  
+}
+
+blockquote {
+  cite {
+    text-align: right;
+    display: inline-block;
+    width: 100%;
+  }
+}
+
+aside {
+  font-size: 0.9em;
 
   &.right {
     text-align: right;
@@ -330,7 +344,7 @@ aside {
 
 select {
   appearance: none;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   border-radius: var(--radius-small);
   font-size: var(--font-size-small);
   padding: var(--spacing-small) var(--spacing-xlarge) var(--spacing-small) var(--spacing-small);
@@ -338,11 +352,11 @@ select {
   text-align: left;
 
   &:hover {
-    border-color: var(--accent-colour);
+    border-color: var(--colour-accent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--accent-colour);
+    outline: 2px solid var(--colour-accent);
     outline-offset: 2px;
   }
 
@@ -360,7 +374,7 @@ dialog {
   padding: 0;
   min-width: 280px;
   max-width: 90vw;
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   border-radius: var(--radius-small);
   background: var(--colour-bg);
   color: var(--colour-bg-contrast);
@@ -380,7 +394,7 @@ dialog {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-standard) var(--spacing-large);
-    border-bottom: 1px solid var(--border-colour);
+    border-bottom: 1px solid var(--colour-border);
   }
 
   .dialog-content {
@@ -404,7 +418,7 @@ dialog {
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent-colour);
+  outline: 3px solid var(--colour-accent);
   outline-offset: 4px;
   border-radius: var(--spacing-small);
 }
@@ -462,7 +476,7 @@ dialog {
   left: 50%;
   z-index: 10;
   padding: var(--spacing-small) var(--spacing-standard);
-  background: var(--text-colour);
+  background: var(--colour-text);
   color: var(--colour-bg);
   transform: translateY(-120%) translateX(-50%);
 }
@@ -504,8 +518,8 @@ dialog {
     &.parent-link {
       pointer-events: auto;
       width: var(--site-title-size);
-      border-bottom: 1px solid var(--border-colour);
-      border-right: 1px solid var(--border-colour);
+      border-bottom: 1px solid var(--colour-border);
+      border-right: 1px solid var(--colour-border);
       margin-right: -1px;
     }
   }
@@ -513,8 +527,8 @@ dialog {
   .page-title {
     width: var(--site-title-size);
     display: flex;
-    border-right: 1px solid var(--border-colour);
-    border-bottom: 1px solid var(--border-colour);
+    border-right: 1px solid var(--colour-border);
+    border-bottom: 1px solid var(--colour-border);
   }
 
   .site-title-link {
@@ -552,7 +566,7 @@ dialog {
       width: var(--site-title-size);
       aspect-ratio: 1 / 1;
       position: relative;
-      border: 1px solid var(--border-colour);
+      border: 1px solid var(--colour-border);
     }
 
     .site-title-name {
@@ -611,7 +625,7 @@ dialog {
   border-bottom-left-radius: var(--spacing-standard);
 
   &:focus-within {
-    outline: 3px solid var(--accent-colour);
+    outline: 3px solid var(--colour-accent);
     outline-offset: 4px;
   }
 
@@ -657,7 +671,7 @@ dialog {
 
   li+li {
     padding-inline-start: var(--spacing-small);
-    border-inline-start: 1px solid var(--border-colour);
+    border-inline-start: 1px solid var(--colour-border);
   }
 }
 
@@ -687,8 +701,9 @@ dialog {
 
 .highlighted-items {
   article {
+    border: none;
     padding-inline-start: var(--spacing-standard);
-    border-inline-start: 0.25rem solid var(--accent-colour);
+    border-inline-start: 0.25rem solid var(--colour-accent);
 
     +article {
       margin-top: var(--spacing-large);
@@ -706,6 +721,13 @@ dialog {
   font-style: italic;
 }
 
+.button-container {
+  display:flex;
+  gap: var(--spacing-standard);
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
 .t-o-c {
   --contents-height: 500px;
 
@@ -715,7 +737,11 @@ dialog {
   flex-direction: column;
   color: var(--colour-bg);
   border-bottom-right-radius: var(--spacing-standard);
-  background: var(--heading-colour);
+  background: var(--colour-heading);
+
+  &:not(:first-child) {
+    margin-top: var(--spacing-small);
+  }
 
   &::details-content {
     opacity: 0;
@@ -742,7 +768,7 @@ dialog {
   summary {
     padding: 0 var(--spacing-standard);
     height: var(--site-title-size);
-    background: var(--heading-colour);
+    background: var(--colour-heading);
     display: flex;
     align-items: center;
     border-bottom-right-radius: var(--spacing-standard);
@@ -750,7 +776,7 @@ dialog {
     transition: var(--default-transition);
 
     &:focus {
-      outline: 2px solid var(--accent-colour);
+      outline: 2px solid var(--colour-accent);
       outline-offset: 2px;
     }
 
@@ -795,7 +821,7 @@ dialog {
 
 .rss-link {
   height: 48px;
-  background-color: var(--heading-colour);
+  background-color: var(--colour-heading);
   padding: var(--spacing-small) var(--spacing-standard);
   border-radius: var(--radius-small);
   color: var(--colour-bg);
@@ -869,10 +895,10 @@ dialog {
 @media print {
   :root {
     --colour-bg: #ffffff;
-    --text-colour: #000000;
-    --heading-colour: #000000;
-    --accent-colour: #000000;
-    --border-colour: #777777;
+    --colour-text: #000000;
+    --colour-heading: #000000;
+    --colour-accent: #000000;
+    --colour-border: #777777;
   }
 
   body {

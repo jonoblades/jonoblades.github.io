@@ -49,7 +49,7 @@ body {
   padding: var(--spacing-large);
   border-radius: var(--radius-small);
   background: var(--colour-surface);
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   backdrop-filter: blur(6px);
   margin: 0;
 
@@ -116,7 +116,7 @@ body {
   padding: var(--spacing-large);
   border-radius: var(--radius-small);
   background: var(--colour-surface);
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
 }
 
 .select-wrapper {
@@ -130,15 +130,15 @@ body {
     top: 50%;
     width: 4px;
     height: 4px;
-    border-right: 2px solid var(--border-colour);
-    border-bottom: 2px solid var(--border-colour);
+    border-right: 2px solid var(--colour-border);
+    border-bottom: 2px solid var(--colour-border);
     transform: translateY(-70%) rotate(45deg);
     pointer-events: none;
     transition: transform 0.3s ease;
   }
 
   &:hover::after {
-    border-color: var(--accent-colour);
+    border-color: var(--colour-accent);
   }
 
   &:has(select:open)::after {

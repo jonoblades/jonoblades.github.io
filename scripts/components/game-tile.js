@@ -100,7 +100,7 @@ class GameTile extends HTMLElement {
           --tile-border-radius: calc(var(--radius-small, 0.25rem) * var(--tile-scale));
           --tile-border-width: var(--border-sm, 2px);
           --tile-bg: var(--colour-tile-bg, #ffffff);
-          --tile-border: var(--border-colour, #d3d6da);
+          --tile-border: var(--colour-border, #d3d6da);
           --tile-text: var(--colour-tile-text, #1a1a1b);
         }
 
@@ -176,7 +176,7 @@ class GameTile extends HTMLElement {
 
         input.tile:focus,
         input.tile:focus-visible {
-          outline: 3px solid var(--accent-colour);
+          outline: 3px solid var(--colour-accent);
           outline-offset: 4px;
           border-radius: var(--spacing-small);
         }

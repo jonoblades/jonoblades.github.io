@@ -23,7 +23,7 @@
   gap: var(--spacing-small);
   cursor: pointer;
   padding: var(--spacing-small) var(--spacing-small);
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   border-radius: var(--radius-small);
   transition:
     border-color 0.2s,
@@ -31,12 +31,12 @@
   flex: 1 1 100%;
 
   &:hover {
-    border-color: var(--accent-colour);
+    border-color: var(--colour-accent);
   }
 
   &:has(input:checked) {
-    border-color: var(--accent-colour);
-    background: var(--accent-colour);
+    border-color: var(--colour-accent);
+    background: var(--colour-accent);
     color: var(--colour-white);
   }
 
@@ -57,7 +57,7 @@
   display: none;
   padding: var(--spacing-small) var(--spacing-small);
   border-radius: var(--radius-small);
-  border: 1px solid var(--border-colour);
+  border: 1px solid var(--colour-border);
   background: rgba(255, 255, 255, 0.06);
   color: var(--colour-white);
   font-size: var(--font-size);
