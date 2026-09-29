@@ -3,6 +3,30 @@ description: Software developer, writer and maker based near Glasgow, Scotland.
 
 url: "https://jonoblades.github.io"
 baseurl: ""
+author:
+  name: Jonathan Blades
+
+plugins:
+  - jekyll-feed
+
+collections:
+  writing:
+    title: "Writing"
+    output: true
+    permalink: /writing/:name/
+  fifty-words:
+    title: "Fifty Words"
+    output: true
+    permalink: /fifty-words/:name/
+
+feed:
+  icon: "/assets/favicon-512x512.png"
+  logo: "/assets/favicon-512x512.png"
+  collections:
+    writing:
+      path: "/writing/feed.xml"
+    fifty-words:
+      path: "/fifty-words/feed.xml"
 
 exclude:
   - README.md

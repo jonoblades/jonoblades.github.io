@@ -793,6 +793,18 @@ dialog {
   }
 }
 
+.rss-link {
+  height: 48px;
+  background-color: var(--heading-colour);
+  padding: var(--spacing-small) var(--spacing-standard);
+  border-radius: var(--radius-small);
+  color: var(--colour-bg);
+  text-decoration: none;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
 .hidden {
   display: none;
 }
