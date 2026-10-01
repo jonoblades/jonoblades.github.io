@@ -3,6 +3,26 @@ description: Software developer, writer and maker based near Glasgow, Scotland.
 
 url: "https://jonoblades.github.io"
 baseurl: ""
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      image:
+        path: /assets/images/og-image.png
+        width: 1200
+        height: 630
+  - scope:
+      path: ""
+      type: fifty-words
+    values:
+      layout: default
+  - scope:
+      path: ""
+      type: writing
+    values:
+      layout: default
+
 author:
   name: Jonathan Blades
 
