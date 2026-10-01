@@ -25,9 +25,15 @@ defaults:
 
 author:
   name: Jonathan Blades
+  url: https://jonoblades.github.io
+locale: en_GB
 
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-archives
+  - jekyll-paginate-v2
 
 collections:
   writing:
@@ -47,6 +53,14 @@ feed:
       path: "/writing/feed.xml"
     fifty-words:
       path: "/fifty-words/feed.xml"
+
+jekyll-archives:
+  enabled:
+    - tags
+  layouts:
+    tag: archive
+  permalinks:
+    tag: /tags/:name/
 
 exclude:
   - README.md

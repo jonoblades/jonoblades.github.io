@@ -1,0 +1,17 @@
+---
+layout: default
+---
+<section>
+  <h2>Posts tagged {{ page.title }}</h2>
+  {% for post in page.posts %}
+  <article>
+    <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+    {% if post.date %}
+    <p><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %B %Y" }}</time></p>
+    {% endif %}
+    {% if post.excerpt %}
+    <p>{{ post.excerpt | strip_html | normalize_whitespace }}</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
