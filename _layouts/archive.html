@@ -1,17 +1,40 @@
 ---
 layout: default
+parent:
+  - link: /tags
+    title: Tags
 ---
-<section>
-  <h2>Posts tagged {{ page.title }}</h2>
-  {% for post in page.posts %}
-  <article>
-    <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-    {% if post.date %}
-    <p><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d %B %Y" }}</time></p>
-    {% endif %}
-    {% if post.excerpt %}
-    <p>{{ post.excerpt | strip_html | normalize_whitespace }}</p>
-    {% endif %}
-  </article>
-  {% endfor %}
-</section>
+
+{% if page.documents and page.documents.size > 0 %}
+  <ul class="archive-list">
+    {% for document in page.documents %}
+      <li class="archive-list__item">
+        <section>
+          <h2>
+            <a href="{{ document.url | relative_url }}">
+              {{ document.title }}
+            </a>
+          </h2>
+
+          {% if document.date %}
+            <p class="archive-list__meta">
+              <time datetime="{{ document.date | date_to_xmlschema }}">
+                {{ document.date | date: "%-d %B %Y" }}
+              </time>
+            </p>
+          {% endif %}
+
+          {% if document.description %}
+            <p>{{ document.description }}</p>
+          {% elsif document.excerpt %}
+            <p>
+              {{ document.excerpt | strip_html | normalize_whitespace }}
+            </p>
+          {% endif %}
+        </section>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>There are no items with this tag.</p>
+{% endif %}

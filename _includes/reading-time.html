@@ -1,8 +1,10 @@
 
 <div class="reading-time no-print">
+  {% if page.last_modified_at %}
   <span>
     Updated: {{ page.last_modified_at | date: "%d %B %Y" }}
   </span>
+  {% endif %}
   
   {% include action-bar.html %}
   {% if page.showReadTime %}
