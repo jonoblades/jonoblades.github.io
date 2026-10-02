@@ -5,7 +5,9 @@
     {% if page.tags %}
     <ul class="tags" aria-label="{{ page.tags_label | default: 'Specialisms' }}">
       {% for item in page.tags %}
-      <li>{{ item }}</li>
+      <li>
+        <a href="/tags/{{ item | slugify }}/">{{ item }}</a>
+      </li>
       {% endfor %}
     </ul>
     {% endif %}

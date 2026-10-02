@@ -1,0 +1,20 @@
+---
+layout: default
+showReadTime: false
+---
+
+{% if page.archives.size > 0 %}
+  <ul class="tag-list tags">
+    {% for archive in page.archives %}
+      <li>
+        <a class="tag" href="{{ archive.url | relative_url }}">{{ archive.name }}</a>
+
+        <span>
+          ({{ archive.count }})
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No tags have been added yet.</p>
+{% endif %}

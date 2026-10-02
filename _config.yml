@@ -30,6 +30,10 @@ defaults:
       layout: game
       showReadTime: false
       showSettings: true
+  - scope:
+      path: "tags"
+    values:
+      showReadTime: false
 
 author:
   name: Jonathan Blades
@@ -40,9 +44,6 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
-  - jekyll-archives
-  - jekyll-paginate-v2
-  - jekyll-reading-time
   - jekyll-last-modified-at
 
 collections:
@@ -64,13 +65,14 @@ feed:
     fifty-words:
       path: "/fifty-words/feed.xml"
 
-jekyll-archives:
-  enabled:
-    - tags
-  layouts:
-    tag: archive
-  permalinks:
-    tag: /tags/:name/
+collection_archives:
+  collections:
+    - writing
+    - fifty-words
+
+  tag_directory: tags
+  archive_layout: archive
+  index_layout: archive-index
 
 exclude:
   - README.md
