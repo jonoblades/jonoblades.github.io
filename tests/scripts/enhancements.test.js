@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function loadEnhancements() {
   vi.resetModules();
@@ -35,12 +35,23 @@ describe('Enhancements', () => {
     vi.restoreAllMocks();
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('marks the document as JavaScript-enabled when initialized', async () => {
     const Enhancements = await loadEnhancements();
 
     await initializeEnhancements(Enhancements);
 
     expect(document.body.classList.contains('js')).toBe(true);
+  });
+
+  it('initializes safely without optional enhancement controls', async () => {
+    document.body.innerHTML = '';
+    const Enhancements = await loadEnhancements();
+
+    await expect(initializeEnhancements(Enhancements)).resolves.toBeUndefined();
   });
 
   it('builds a visible table of contents for more than three headings', async () => {
@@ -84,6 +95,35 @@ describe('Enhancements', () => {
     expect(details.open).toBe(true);
     document.querySelector('#TableOfContents a').dispatchEvent(new Event('click'));
     expect(details.open).toBe(false);
+  });
+
+  it('shows and hides the table of contents as the page height changes', async () => {
+    let onResize;
+    let scrollHeight = 2000;
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback) {
+        onResize = callback;
+      }
+
+      observe() {}
+    });
+    Object.defineProperty(document.body, 'scrollHeight', {
+      configurable: true,
+      get: () => scrollHeight
+    });
+    document.querySelector('#TableOfContents').parentElement.insertAdjacentHTML(
+      'afterend',
+      '<h2>One</h2><h2>Two</h2><h2>Three</h2>'
+    );
+    const Enhancements = await loadEnhancements();
+
+    await initializeEnhancements(Enhancements);
+    onResize();
+    expect(document.querySelector('details').classList.contains('hidden')).toBe(false);
+
+    scrollHeight = 0;
+    onResize();
+    expect(document.querySelector('details').classList.contains('hidden')).toBe(true);
   });
 
   it('initializes the theme checkbox from settings and persists changes', async () => {

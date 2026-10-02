@@ -1,0 +1,31 @@
+<header>
+  <a class="skip-link no-print" href="#main-content">Skip to main content</a>
+  <div class="site-title no-print">
+    <a class="site-title-link" href="{{ '/' | relative_url }}">
+      <div class="logo-wrapper">
+        <span class="logo">
+        </span>
+      </div>
+      <span class="site-title-name">Jonathan Blades</span>
+    </a>
+    {% for item in page.parent %}
+    <a class="parent-link" href="{{ item.link }}">
+      {{ item.title }}
+    </a>
+    {% endfor %}
+    <span class="page-title">
+      {% if page.page_id == 'about' %}
+      About me
+      {% else %}
+      {{ page.heading | default: page.title }}
+      {% endif %}
+    </span>
+  </div>
+  {% include navigation.html %}
+  <div class="theme-toggle no-print" data-tooltip="Toggle theme">
+    <label for="ThemeToggle">
+      <input class="visually-hidden" type="checkbox" role="switch" id="ThemeToggle" name="ThemeToggle">
+      <span class="visually-hidden">Use opposite colour theme.</span>
+    </label>
+  </div>
+</header>

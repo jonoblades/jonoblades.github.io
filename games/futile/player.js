@@ -9,13 +9,13 @@
 // registers NO event listeners. The game attaches a single delegated listener
 // per board region (see Futile.#wireBoardEvents), which avoids the unbounded
 // growth of BaseClass.eventListeners that per-tile listeners caused.
-import BaseClass from '../../scripts/BaseClass.js';
-import GameTile from '../../scripts/components/game-tile.js';
-import { COLOUR_TO_STATUS, compareTiles, isValidMeld, createTileElement, validateTarget } from './shared.js';
+import BaseClass from '/scripts/BaseClass.js';
+import GameTile from '/scripts/components/game-tile.js';
+import { COLOUR_TO_STATUS, compareTiles, isValidMeld, createTileElement, validateTarget } from '/scripts/shared.js';
 
 /**
  * Tile type shared by the Futile modules.
- * @typedef {import('./shared.js').Tile} Tile
+ * @typedef {import('/scripts/shared.js').Tile} Tile
  * 
  * @typedef {import('./selection.js').Selection} Selection
  */

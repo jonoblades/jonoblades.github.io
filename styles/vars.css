@@ -1,8 +1,8 @@
 :root {
   --font-family: 'Inter', sans-serif;
   --font-size-standard: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
-  --font-size-small: 0.875rem;
-  --font-size-large: 1.2rem;
+  --font-size-small: 0.875em;
+  --font-size-large: 1.2em;
   --font-size-xlarge: clamp(1.5rem, 3vw, 2rem);
   --font-size-2xlarge: clamp(2rem, 5vw, 3.25rem);
 

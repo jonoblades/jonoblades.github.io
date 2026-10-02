@@ -5,7 +5,7 @@
  * @module game-tile
  */
 
-import { validateTarget } from '/games/futile/shared.js';
+import { validateTarget } from '../shared.js';
 
 /**
  * Visual states supported by a game tile.

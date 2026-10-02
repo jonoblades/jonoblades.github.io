@@ -9,7 +9,7 @@
 // return { ok, reason }; thin controllers read the Selection and map reasons to
 // user messages; the view stamps data-* and the game handles clicks via a small
 // number of DELEGATED listeners wired once (not per tile, per render).
-import { COLOUR_TO_STATUS, createTileElement, isSet, isRun, validateTarget } from './shared.js';
+import { COLOUR_TO_STATUS, createTileElement, isSet, isRun, validateTarget } from '/scripts/shared.js';
 import { Deck } from './deck.js';
 import { Player } from './player.js';
 import { AIPlayer } from './ai-player.js';
@@ -18,7 +18,7 @@ import BaseClass from '/scripts/BaseClass.js';
 
 /**
  * Tile type shared by the Futile modules.
- * @typedef {import('./shared.js').Tile} Tile
+ * @typedef {import('/scripts/shared.js').Tile} Tile
  */
 
 /**

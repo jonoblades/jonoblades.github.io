@@ -1,18 +1,15 @@
 {% include head.html %}
+
 <body>
-  {% include header.html showNavigation=true showSettings=false %}
+  {% include site-header.html %}
   <main id="main-content">
-    <details class="t-o-c js-only no-print hidden">
-      <summary>Table of Contents</summary>
-      <nav aria-label="Table of Contents">
-        <ul id="TableOfContents"></ul>
-      </nav>
-    </details>
-    {{ content }}
+    <article>
+      {% include page-header.html %}
+      {{ content }}
+    </article>
   </main>
   {% include footer.html %}
-  <script data-goatcounter="https://jonoblades.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+  <script data-goatcounter="https://jonoblades.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 
 </html>

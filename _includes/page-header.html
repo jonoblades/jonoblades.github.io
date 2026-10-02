@@ -1,0 +1,14 @@
+<header>
+  <h1>{{ page.heading | default: page.title }}</h1>
+  <div class="subtitle">
+    <span>{{ page.subtitle }}</span>
+    {% if page.tags %}
+    <ul class="tags" aria-label="{{ page.tags_label | default: 'Specialisms' }}">
+      {% for item in page.tags %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% include reading-time.html %}
+</header>
