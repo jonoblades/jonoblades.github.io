@@ -1,0 +1,15 @@
+<div class="action-bar">
+  <button data-tooltip="Share this page" type="button" id="ShareButton" class="share-button no-print hidden"
+    aria-label="Share this page">
+    Share
+  </button>
+  {% if page.rsslink %}
+  <a data-tooltip="Subscribe to the RSS feed" class="rss-link btn" href="{{ page.rsslink }}">Feed</a>
+  {% endif %}
+  {% if page.showSettings %}
+  <button id="SettingsButton" type="button" data-tooltip="Settings" class="settings-button no-print hidden"
+    aria-label="Settings">
+    Settings
+  </button>
+  {% endif %}
+</div>

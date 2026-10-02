@@ -5,7 +5,7 @@
  * localStorage persistence for settings and statistics.
  * @module game
  */
-import { validateTarget } from '/games/futile/shared.js';
+import { validateTarget } from '/scripts/shared.js';
 import BaseClass from '/scripts/BaseClass.js';
 import definitionsService from '/scripts/DefinitionsService.js';
 import GameTile from '/scripts/components/game-tile.js';

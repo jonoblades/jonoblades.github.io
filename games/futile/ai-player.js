@@ -8,11 +8,11 @@
 // It names the tiles it wants and calls the same
 // public API the human UI uses (createMeld / addToMeld / endTurn). It never
 // touches selection state.
-import { isSet, isRun } from './shared.js';
+import { isSet, isRun } from '/scripts/shared.js';
 
 /**
  * Tile type shared by the Futile modules.
- * @typedef {import('./shared.js').Tile} Tile
+ * @typedef {import('/scripts/shared.js').Tile} Tile
  */
 
 /**

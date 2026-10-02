@@ -1,0 +1,23 @@
+
+<div class="reading-time no-print">
+  <span>
+    Updated: {{ page.last_modified_at | date: "%d %B %Y" }}
+  </span>
+  
+  {% include action-bar.html %}
+  {% if page.showReadTime %}
+  <span>
+    {% assign words = content | strip_html | number_of_words %}
+    {% assign minutes = words | divided_by: 200.0 | ceil %}
+    {% if words < 100 %}
+    {{ words }} words
+    {% elsif minutes < 1 %}
+    Reading time: Less than a minute
+    {% elsif minutes == 1 %}
+    Reading time: ~1 min read
+    {% else %}
+    Reading time: ~{{ minutes }} mins
+    {% endif %}
+  </span>
+  {% endif %}
+</div>

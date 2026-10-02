@@ -444,6 +444,58 @@ describe('Wordley page', () => {
       .toBe('var(--colour-danger)');
   });
 
+  it('logs failed length changes and resets without breaking the current game', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+    definitionsService.getWords.mockRejectedValueOnce(new Error('word list unavailable'));
+
+    document.getElementById('lengthSelect').dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(consoleError).toHaveBeenCalledOnce());
+
+    definitionsService.getWords.mockRejectedValueOnce(new Error('word list unavailable'));
+    document.getElementById('resetGame').click();
+    await vi.waitFor(() => expect(consoleError).toHaveBeenCalledTimes(2));
+
+    expect(document.querySelectorAll('#board .row')).toHaveLength(6);
+  });
+
+  it('falls back to defaults when saved settings cannot be read', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    localStorage.setItem('wordley_settings', '{invalid json');
+    const initialize = await loadWordley();
+
+    await initializePage(initialize);
+
+    expect(warn).toHaveBeenCalledWith(
+      'Failed to load settings from localStorage:',
+      expect.any(SyntaxError)
+    );
+    expect(document.getElementById('lengthValue').textContent).toBe('5');
+  });
+
+  it('ends a timed single-player game after the final timer expiry', async () => {
+    let timerCallback;
+    vi.spyOn(globalThis, 'setInterval').mockImplementation((callback) => {
+      timerCallback = callback;
+      return 1;
+    });
+    vi.spyOn(globalThis, 'clearInterval').mockImplementation(() => {});
+    vi.stubGlobal('requestAnimationFrame', (callback) => callback());
+    localStorage.setItem('wordley_settings', JSON.stringify({ timerDuration: 1 }));
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+
+    document.querySelector('.guess-letter').dispatchEvent(new CustomEvent('tile-input', {
+      bubbles: true,
+      detail: { value: 'c', index: 0 },
+    }));
+    for (let row = 0; row < 6; row++) timerCallback();
+
+    expect(document.getElementById('message').textContent).toContain('Out of guesses!');
+    expect(document.getElementById('submitGuess').disabled).toBe(true);
+  });
+
   it('ignores submissions after a game has ended', async () => {
     const initialize = await loadWordley();
     await initializePage(initialize);

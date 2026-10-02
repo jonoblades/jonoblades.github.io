@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     testTimeout: 15000,
     coverage: {
+      exclude: ['tests/**'],
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],
       thresholds: {
@@ -15,7 +16,7 @@ export default defineConfig({
         lines: 80
       }
     },
-    exclude: ['node_modules', '_site/**']
+    exclude: ['node_modules', '_site/**'],
   },
   resolve: {
     alias: {

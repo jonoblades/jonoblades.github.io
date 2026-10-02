@@ -8,6 +8,8 @@ defaults:
   - scope:
       path: ""
     values:
+      layout: page
+      showReadTime: true
       image:
         path: /assets/images/og-image.png
         width: 1200
@@ -16,12 +18,18 @@ defaults:
       path: ""
       type: fifty-words
     values:
-      layout: default
+      layout: post
   - scope:
       path: ""
       type: writing
     values:
-      layout: default
+      layout: post
+  - scope:
+      path: "games"
+    values:
+      layout: game
+      showReadTime: false
+      showSettings: true
 
 author:
   name: Jonathan Blades
@@ -34,6 +42,8 @@ plugins:
   - jekyll-seo-tag
   - jekyll-archives
   - jekyll-paginate-v2
+  - jekyll-reading-time
+  - jekyll-last-modified-at
 
 collections:
   writing:

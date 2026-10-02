@@ -252,6 +252,49 @@ describe('Futile UI wiring', () => {
     invalidPlayerCount.dispatchEvent(new Event('change', { bubbles: true }));
     expect(game.players).toHaveLength(2);
   });
+
+  it('ignores blank, malformed, and non-human delegated board clicks', async () => {
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    const area = document.querySelector('.player-area');
+
+    area.click();
+
+    const ownerlessTile = document.createElement('game-tile');
+    ownerlessTile.dataset.id = 'ownerless';
+    area.appendChild(ownerlessTile);
+    ownerlessTile.click();
+
+    const malformedTile = document.createElement('game-tile');
+    malformedTile.dataset.id = 'malformed';
+    malformedTile.dataset.owner = 'not-a-number';
+    malformedTile.dataset.meldIdx = '0';
+    area.appendChild(malformedTile);
+    malformedTile.click();
+
+    game.currentPlayer = 1;
+    area.click();
+    document.getElementById('tileRack').click();
+
+    expect(document.querySelector('#tileRack game-tile[selected]')).toBeNull();
+  });
+
+  it('selects a meld tile through the delegated player-area listener', async () => {
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    await game.players[0].addMeld([
+      T('blue', 7, 'm1'),
+      T('red', 7, 'm2'),
+      T('green', 7, 'm3')
+    ]);
+    game.renderAllHands();
+
+    document.querySelector('game-tile[data-id="m1"]').click();
+
+    expect(document.querySelector('game-tile[data-id="m1"]').getAttribute('selected')).toBe('');
+  });
 });
 
 describe('game-over action guards', () => {
@@ -267,6 +310,13 @@ describe('game-over action guards', () => {
 });
 
 describe('createMeld', () => {
+  it('rejects an empty selection', async () => {
+    const game = new Futile(2, 0);
+
+    expect(await game.createMeld({ handTileIds: [], meldTileIds: [] }))
+      .toEqual({ ok: false, reason: 'empty' });
+  });
+
   it('plays a valid set from the hand', async () => {
     const g = new Futile(2, 0);
     g.currentPlayer = 0;
@@ -448,6 +498,31 @@ describe('addToMeld', () => {
 
     expect(await game.addToMeld({ targetOwner: 0, targetMeldIdx: 0, handTileIds: ['h1'] }))
       .toEqual({ ok: false, reason: 'add-failed' });
+  });
+
+  it('reports a missing destination when transferring tiles empties it', async () => {
+    const game = new Futile(2, 0);
+    const destinationPlayer = game.players[0];
+    const currentPlayer = game.players[1];
+    game.currentPlayer = 1;
+    await destinationPlayer.addMeld([
+      T('blue', 7, 'd1'),
+      T('red', 7, 'd2'),
+      T('green', 7, 'd3')
+    ]);
+    await currentPlayer.addMeld([
+      T('blue', 3, 'p1'),
+      T('red', 3, 'p2'),
+      T('green', 3, 'p3')
+    ]);
+    currentPlayer.receiveTile(T('amber', 7, 'h1'));
+
+    expect(await game.addToMeld({
+      targetOwner: 0,
+      targetMeldIdx: 0,
+      handTileIds: ['h1'],
+      meldTileIds: ['d1', 'd2', 'd3']
+    })).toEqual({ ok: false, reason: 'no-dest' });
   });
 });
 
@@ -743,6 +818,21 @@ describe('AIPlayer drives the public API', () => {
 });
 
 describe('turn flow and bot rendering', () => {
+  it('automatically passes a bot tile or an empty bot hand', async () => {
+    const gameWithTile = new Futile(2, 0);
+    gameWithTile.currentPlayer = 1;
+    gameWithTile.players[1].receiveTile(T('blue', 4, 'bot-tile'));
+
+    await gameWithTile.endTurn();
+    expect(gameWithTile.currentPlayer).toBe(0);
+    expect(gameWithTile.players[1].hand).toHaveLength(1);
+
+    const gameWithoutTile = new Futile(2, 0);
+    gameWithoutTile.currentPlayer = 1;
+    await gameWithoutTile.endTurn();
+    expect(gameWithoutTile.currentPlayer).toBe(0);
+  });
+
   it('masks a bot hand and applies queued passes after a full round', async () => {
     vi.useFakeTimers();
     document.body.innerHTML = futileMarkup(2);

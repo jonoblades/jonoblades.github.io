@@ -5,11 +5,11 @@
  * Tile ids are globally unique so selections can safely identify tiles.
  * @module futile/deck
  */
-import { COLOURS, NUMBERS, COPIES_PER_TILE, shuffle } from './shared.js';
+import { COLOURS, NUMBERS, COPIES_PER_TILE, shuffle } from '/scripts/shared.js';
 
 /**
  * Tile type shared by the Futile modules.
- * @typedef {import('./shared.js').Tile} Tile
+ * @typedef {import('/scripts/shared.js').Tile} Tile
  */
 
 /**

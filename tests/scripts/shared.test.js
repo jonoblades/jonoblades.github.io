@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isSet, isRun, isValidMeld, compareTiles, validateTarget } from '../../../games/futile/shared.js';
+import { isSet, isRun, isValidMeld, compareTiles, validateTarget } from '../../scripts/shared.js';
 
 const tile = (colour, number, id = `${colour}-${number}-${Math.random()}`) => ({ id, colour, number });
 

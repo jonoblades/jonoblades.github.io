@@ -1,13 +1,5 @@
-{% include head.html %}
-<body>
-  {% include header.html showNavigation=false showSettings=true %}
-  <main id="main-content">
-    {{ content }}
-  </main>
-  {% include game-footer.html %}
-  <script src="{{ '/scripts/components/game-tile.js' }}" type="module"></script>
-  <script data-goatcounter="https://jonoblades.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-</body>
-
-</html>
+---
+layout: default
+---
+{{ content }}
+<script src="{{ '/scripts/components/game-tile.js' }}" type="module"></script>
