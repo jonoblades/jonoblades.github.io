@@ -7,6 +7,7 @@
   "repository": "https://github.com/jonoblades/jonoblades.github.io.git",
   "author": "Jonathan <jonoblades@gmail.com>",
   "license": "MIT",
+  "packageManager": "yarn@4.18.0",
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",
     "chart.js": "^4.5.1",
