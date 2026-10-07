@@ -614,7 +614,9 @@ dialog {
     position-anchor: --tooltip-anchor;
     background-color: var(--colour-bg-contrast);
     color: var(--colour-bg);
-    font-size: 0.8rem;
+    font-size: 0.8rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.12em !important;
     padding: var(--spacing-small);
     border-radius: var(--spacing-small);
     white-space: pre-wrap;

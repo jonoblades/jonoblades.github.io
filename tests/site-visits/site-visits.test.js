@@ -148,6 +148,25 @@ describe('site visits dashboard', () => {
     expect(document.querySelectorAll('.dashboard-breakdown time')).toHaveLength(7);
   });
 
+  it('renders the GoatCounter total and daily stats response format', async () => {
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new MessageEvent('message', {
+      data: JSON.stringify({
+        ...dashboard,
+        data: {
+          ...dashboard.data,
+          total: {
+            total: 11,
+            stats: [{ day: '2026-10-01', daily: 7 }, { day: '2026-10-02', daily: 4 }]
+          }
+        }
+      })
+    }));
+    expect(document.querySelector('#visit-total').textContent).toBe('11');
+    expect(Chart.mock.calls[0][1].data.labels).toEqual(['2026-10-01', '2026-10-02']);
+    expect(Chart.mock.calls[0][1].data.datasets[0].data).toEqual([7, 4]);
+  });
+
   it('restores saved data and retains it while disconnected with delayed reconnects', async () => {
     localStorage.setItem('site-visits:https://dashboard.example.test', JSON.stringify(dashboard));
     await import('../../src/site/site-visits/site-visits.js');

@@ -2,9 +2,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
 }
 
-.stats-page > * {
+.stats-page>* {
   min-width: 0;
 }
 
@@ -31,13 +37,25 @@
   margin: var(--spacing-small) 0 var(--spacing-standard);
   font-size: var(--font-size-small);
   overflow-wrap: anywhere;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+  width: 2rem;
+  letter-spacing: normal;
+  border: 2px solid currentColor;
+  border-radius: 50%;
 }
 
 .dashboard-overview {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: var(--spacing-large);
+  .dashboard-overview-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--spacing-large);
+  }
 }
 
 .visit-total {
@@ -58,6 +76,7 @@
 .chart-frame {
   position: relative;
   height: 20rem;
+  max-height: min-content;
   margin-top: var(--spacing-standard);
 
   canvas {
@@ -94,6 +113,9 @@
     h3 {
       margin: 0 0 var(--spacing-small);
       font-size: var(--font-size-standard);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
     }
   }
 }
@@ -154,7 +176,7 @@
     flex-direction: column;
   }
 
-  .dashboard-overview > div {
+  .dashboard-overview>div {
     max-width: 100%;
   }
 

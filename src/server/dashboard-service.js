@@ -30,6 +30,37 @@ function dashboardRange(now) {
   };
 }
 
+function totalFromHits(report, range) {
+  if (report?.more !== false || !Array.isArray(report.hits)) {
+    return;
+  }
+  const dailyCounts = new Map();
+  const date = new Date(`${range.start}T00:00:00Z`);
+  while (date.toISOString().slice(0, 10) <= range.end) {
+    dailyCounts.set(date.toISOString().slice(0, 10), 0);
+    date.setUTCDate(date.getUTCDate() + 1);
+  }
+  for (const hit of report.hits) {
+    if (!Array.isArray(hit?.stats)) {
+      return;
+    }
+    for (const stat of hit.stats) {
+      if (!stat || !dailyCounts.has(stat.day) || !Number.isSafeInteger(stat.daily) || stat.daily < 0) {
+        return;
+      }
+      dailyCounts.set(stat.day, dailyCounts.get(stat.day) + stat.daily);
+    }
+  }
+  const total = [...dailyCounts.values()].reduce((sum, count) => sum + count, 0);
+  if (!Number.isSafeInteger(report.total) || report.total !== total) {
+    return;
+  }
+  return {
+    total,
+    stats: [...dailyCounts].map(([day, daily]) => ({ day, daily }))
+  };
+}
+
 export function createDashboardService({
   apiBaseUrl,
   apiToken,
@@ -67,7 +98,9 @@ export function createDashboardService({
     });
 
     if (!response.ok) {
-      throw new Error(`GoatCounter returned ${response.status} for ${name}.`);
+      throw Object.assign(new Error(`GoatCounter returned ${response.status} for ${name}.`), {
+        status: response.status
+      });
     }
 
     return response.json();
@@ -93,6 +126,16 @@ export function createDashboardService({
         errors[name] = errorMessage(result.reason);
       }
     });
+
+    const totalResult = results[dashboardReports.indexOf('total')];
+    if (totalResult.status === 'rejected' && totalResult.reason?.status === 404 && !errors.hits) {
+      const derivedTotal = totalFromHits(data.hits, range);
+      if (derivedTotal) {
+        data.total = derivedTotal;
+        reportMetadata.total = { ...reportMetadata.hits, source: 'hits' };
+        delete errors.total;
+      }
+    }
 
     if (Object.keys(errors).length === dashboardReports.length
       && !dashboardReports.some((name) => data[name] != null)) {

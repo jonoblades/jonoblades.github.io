@@ -71,6 +71,11 @@ Each report retains its last successful data, update timestamp, and date range i
 latest snapshot locally and keeps displaying it during outages. This local snapshot is not available to new visitors.
 Deployments disconnect clients, which reconnect with exponential backoff and jitter (up to five minutes).
 
+If GoatCounter returns 404 for `/stats/total`, the service can derive daily totals from the current `hits` response
+only when `more` is false and the daily sum matches its reported total. The derived report uses the hits report's
+timestamp and range. Paginated or inconsistent results retain the previous total (or leave it unavailable), rather
+than displaying an incomplete sum. This fallback makes no additional upstream requests.
+
 ### Zero-cost requirement
 
 Use **Workers Free**, not Workers Paid. SQLite-backed Durable Objects are supported on Free. This configuration
