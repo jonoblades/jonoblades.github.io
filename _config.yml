@@ -3,6 +3,7 @@ description: Software developer, writer and maker based near Glasgow, Scotland.
 
 url: "https://jonoblades.github.io"
 baseurl: ""
+dashboard_api_url: ""
 
 defaults:
   - scope:
@@ -83,3 +84,11 @@ exclude:
   - .jekyll-cache
   - .jekyll-metadata
   - node_modules
+  - site-visits/server.js
+  - site-visits/dashboard-service.js
+  - site-visits/dev.js
+  - site-visits/wrangler.jsonc
+  - site-visits/.wrangler
+  - site-visits/.env
+  - site-visits/.dev.vars
+  - tests/site-visits

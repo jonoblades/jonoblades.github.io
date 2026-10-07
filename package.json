@@ -9,15 +9,21 @@
   "license": "MIT",
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",
+    "chart.js": "^4.5.1",
     "jsdom": "26",
     "vite": "^8.2.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "wrangler": "^4.148.0"
   },
   "scripts": {
     "test": "vitest",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml"
+    "test:coverage": "vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml",
+    "site-visits": "wrangler dev --config site-visits/wrangler.jsonc --port 4174 --var DASHBOARD_ORIGIN:http://localhost:4000",
+    "deploy:site-visits": "wrangler deploy --config site-visits/wrangler.jsonc",
+    "check:site-visits": "wrangler deploy --config site-visits/wrangler.jsonc --dry-run",
+    "dev:site-visits": "node site-visits/dev.js"
   }
 }

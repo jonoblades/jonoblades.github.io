@@ -1,0 +1,46 @@
+---
+layout: default
+title: Site visits
+subtitle: Site analytics
+showReadTime: false
+styles:
+  - ./site-visits.css
+---
+<div class="stats-page">
+  <div class="dashboard-heading">
+    <p id="dashboard-range">Loading dashboard...</p>
+    <p id="dashboard-status" role="status" aria-live="polite"></p>
+  </div>
+
+  <section class="dashboard-overview" aria-labelledby="overview-title">
+    <div>
+      <h2 id="overview-title">Visits</h2>
+      <p id="visit-total" class="visit-total">-</p>
+      <p id="visit-total-updated" class="report-updated"></p>
+    </div>
+    <p class="dashboard-context">All tracked visits in the selected period.</p>
+  </section>
+
+  <section class="dashboard-trend" aria-labelledby="trend-title">
+    <h2 id="trend-title">Daily visits</h2>
+    <p id="visit-trend-updated" class="report-updated"></p>
+    <div class="chart-frame">
+      <canvas id="visit-trend" aria-label="Daily site visits"></canvas>
+      <p id="visit-trend-empty" hidden>No visit trend is available for this period.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="pages-title">
+    <h2 id="pages-title">Top pages</h2>
+    <p id="top-pages-updated" class="report-updated"></p>
+    <div id="top-pages"></div>
+  </section>
+
+  <section aria-labelledby="breakdowns-title">
+    <h2 id="breakdowns-title">Audience breakdown</h2>
+    <div id="dashboard-breakdowns" class="dashboard-breakdowns"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script type="module" data-dashboard-api="{{ site.dashboard_api_url | escape }}" src="{{ '/site-visits/site-visits.js' | relative_url }}"></script>
