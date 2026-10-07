@@ -310,8 +310,7 @@ function renderDashboard(dashboard) {
     section.className = 'dashboard-breakdown';
     const heading = document.createElement('h3');
     const updated = document.createElement('span');
-    updated.className = 'report-updated';
-    updated.textContent = 'i';
+    updated.className = 'info-icon';
     const content = document.createElement('div');
     heading.textContent = title;
     heading.append(updated);

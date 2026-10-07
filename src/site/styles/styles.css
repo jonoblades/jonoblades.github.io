@@ -790,6 +790,27 @@ pre {
   }
 }
 
+.info-icon {
+  margin: var(--spacing-small) 0 var(--spacing-standard);
+  font-size: var(--font-size-standard);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+  width: 1.5rem;
+  letter-spacing: normal;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+
+  &::before {
+    content: 'i';
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

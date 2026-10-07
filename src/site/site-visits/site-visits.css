@@ -33,22 +33,6 @@
   text-align: right;
 }
 
-.report-updated {
-  margin: var(--spacing-small) 0 var(--spacing-standard);
-  font-size: var(--font-size-small);
-  overflow-wrap: anywhere;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  text-align: center;
-  width: 2rem;
-  letter-spacing: normal;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-}
-
 .dashboard-overview {
   .dashboard-overview-details {
     display: flex;
