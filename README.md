@@ -112,11 +112,13 @@ After confirming the account uses Workers Free:
 yarn wrangler login
 yarn check:site-visits
 yarn deploy:site-visits
-yarn wrangler secret put GOATCOUNTER_API_BASE_URL --config src/server/wrangler.jsonc
 yarn wrangler secret put GOATCOUNTER_API_TOKEN --config src/server/wrangler.jsonc
 ```
 
-Enter each value directly at the Wrangler prompt. The dashboard remains unavailable until both secrets exist.
+The non-secret `GOATCOUNTER_API_BASE_URL` is stored in `src/server/wrangler.jsonc` alongside `DASHBOARD_ORIGIN`.
+Enter the token directly at the Wrangler prompt. The dashboard remains unavailable until the token secret exists.
+When deploying through Cloudflare's Git integration, set the token under Worker **Settings > Variables & Secrets**,
+not build variables. Keep non-secret runtime variables in the Wrangler configuration so future deployments preserve them.
 Set `dashboard_api_url` in `_config.yml` to the HTTPS Worker URL printed by deployment, then publish GitHub Pages.
 Until configured, the public frontend displays an unavailable state instead of connecting to localhost.
 The optional `?dashboard-api=https://YOUR-WORKER.workers.dev` parameter overrides the endpoint for testing.

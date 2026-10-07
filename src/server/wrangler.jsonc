@@ -5,7 +5,8 @@
   "compatibility_date": "2026-10-07",
   "workers_dev": true,
   "vars": {
-    "DASHBOARD_ORIGIN": "https://jonoblades.github.io"
+    "DASHBOARD_ORIGIN": "https://jonoblades.github.io",
+    "GOATCOUNTER_API_BASE_URL": "https://jonoblades.goatcounter.com/api/v0/stats/"
   },
   "durable_objects": {
     "bindings": [

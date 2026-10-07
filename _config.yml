@@ -6,7 +6,7 @@ description: Software developer, writer and maker based near Glasgow, Scotland.
 
 url: "https://jonoblades.github.io"
 baseurl: ""
-dashboard_api_url: ""
+dashboard_api_url: "https://jonoblades-site-visits.jonoblades-cloudflare.workers.dev"
 
 defaults:
   - scope:
