@@ -1,0 +1,19 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "jonoblades-site-visits",
+  "main": "server.js",
+  "compatibility_date": "2026-10-07",
+  "workers_dev": true,
+  "vars": {
+    "DASHBOARD_ORIGIN": "https://jonoblades.github.io"
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "DASHBOARD", "class_name": "Dashboard" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Dashboard"] }
+  ],
+  "observability": { "enabled": false }
+}

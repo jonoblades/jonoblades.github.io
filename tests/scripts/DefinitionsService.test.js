@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function loadService() {
   vi.resetModules();
-  const module = await import('../../scripts/DefinitionsService.js');
+  const module = await import('../../src/site/scripts/DefinitionsService.js');
   return module.default;
 }
 

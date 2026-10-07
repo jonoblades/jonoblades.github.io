@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function loadEnhancements() {
   vi.resetModules();
-  const module = await import('../../scripts/Enhancements.js');
+  const module = await import('../../src/site/scripts/Enhancements.js');
   return module.default;
 }
 
@@ -130,7 +130,7 @@ describe('Enhancements', () => {
     localStorage.setItem('theme', JSON.stringify('other'));
     const Enhancements = await loadEnhancements();
 
-    const settings = (await import('../../scripts/Settings.js')).default;
+    const settings = (await import('../../src/site/scripts/Settings.js')).default;
     settings.theme = 'other';
     await initializeEnhancements(Enhancements);
 

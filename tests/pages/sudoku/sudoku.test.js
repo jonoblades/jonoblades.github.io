@@ -29,7 +29,7 @@ const puzzle = {
 
 async function loadSudoku() {
   vi.resetModules();
-  const { Sudoku } = await import('../../../games/sudoku/sudoku.js');
+  const { Sudoku } = await import('../../../src/site/games/sudoku/sudoku.js');
   const game = new Sudoku();
   return () => game._ready();
 }

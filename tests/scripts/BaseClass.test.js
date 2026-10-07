@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import BaseClass from '../../scripts/BaseClass.js';
+import BaseClass from '../../src/site/scripts/BaseClass.js';
 
 describe('BaseClass', () => {
   beforeEach(() => {

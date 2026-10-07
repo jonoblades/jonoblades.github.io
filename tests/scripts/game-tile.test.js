@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import GameTile from '../../scripts/components/game-tile.js';
+import GameTile from '../../src/site/scripts/components/game-tile.js';
 
 function createTile(attributes = {}) {
   const tile = new GameTile();

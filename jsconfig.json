@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "/scripts/*": ["scripts/*"]
+      "/scripts/*": ["./src/site/scripts/*"]
     },
     "checkJs": true
   },
-  "include": ["scripts/**/*.js", "games/**/*.js"]
+  "include": ["src/site/scripts/**/*.js", "src/site/games/**/*.js"]
 }

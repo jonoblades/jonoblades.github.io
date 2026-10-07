@@ -1,8 +1,8 @@
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { Futile } from '../../../games/futile/futile.js';
-import { AIPlayer } from '../../../games/futile/ai-player.js';
-import { Deck } from '../../../games/futile/deck.js';
-import { Player } from '../../../games/futile/player.js';
+import { Futile } from '../../../src/site/games/futile/futile.js';
+import { AIPlayer } from '../../../src/site/games/futile/ai-player.js';
+import { Deck } from '../../../src/site/games/futile/deck.js';
+import { Player } from '../../../src/site/games/futile/player.js';
 
 // Plain tile objects with deterministic ids.
 const T = (colour, number, id) => ({ id, colour, number });

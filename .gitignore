@@ -9,3 +9,7 @@ _site/
 vendor/
 
 test-report.junit.xml
+src/server/.env
+.wrangler/
+.dev.vars*
+.env*
