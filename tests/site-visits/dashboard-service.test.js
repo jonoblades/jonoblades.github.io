@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createDashboardService,
   dashboardReports
-} from '../../site-visits/dashboard-service.js';
+} from '../../src/server/dashboard-service.js';
 
 function successfulResponse(url) {
   return new Response(JSON.stringify({

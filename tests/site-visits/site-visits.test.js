@@ -88,7 +88,7 @@ describe('site visits dashboard', () => {
   });
 
   it('loads one snapshot and renders the fixed dashboard reports', async () => {
-    await import('../../site-visits/site-visits.js');
+    await import('../../src/site/site-visits/site-visits.js');
     socket.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(dashboard) }));
 
     expect(fetch).not.toHaveBeenCalled();
@@ -137,7 +137,7 @@ describe('site visits dashboard', () => {
   });
 
   it('renders retained failed reports with their own timestamps and date ranges', async () => {
-    await import('../../site-visits/site-visits.js');
+    await import('../../src/site/site-visits/site-visits.js');
     socket.dispatchEvent(new MessageEvent('message', {
       data: JSON.stringify({ ...dashboard, stale: true, errors: { hits: 'Unavailable' } })
     }));
@@ -150,7 +150,7 @@ describe('site visits dashboard', () => {
 
   it('restores saved data and retains it while disconnected with delayed reconnects', async () => {
     localStorage.setItem('site-visits:https://dashboard.example.test', JSON.stringify(dashboard));
-    await import('../../site-visits/site-visits.js');
+    await import('../../src/site/site-visits/site-visits.js');
     expect(document.querySelector('#visit-total').textContent).toBe('5');
     const previous = socket;
     previous.dispatchEvent(new Event('close'));
@@ -161,7 +161,7 @@ describe('site visits dashboard', () => {
   });
 
   it('uses automatic heartbeats and cancels reconnects when the page leaves', async () => {
-    await import('../../site-visits/site-visits.js');
+    await import('../../src/site/site-visits/site-visits.js');
     socket.dispatchEvent(new Event('open'));
     await vi.advanceTimersByTimeAsync(60000);
     expect(socket.send).toHaveBeenCalledWith('ping');
@@ -176,7 +176,7 @@ describe('site visits dashboard', () => {
   });
 
   it('shows an honest unavailable state on initial upstream failure', async () => {
-    await import('../../site-visits/site-visits.js');
+    await import('../../src/site/site-visits/site-visits.js');
     socket.dispatchEvent(new MessageEvent('message', { data: '{"error":"GoatCounter unavailable"}' }));
     expect(document.querySelector('#dashboard-status').textContent).toBe('GoatCounter unavailable');
     expect(document.querySelector('#visit-total').textContent).not.toBe('0');

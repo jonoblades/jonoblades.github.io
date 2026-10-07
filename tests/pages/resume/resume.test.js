@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function loadResume() {
   vi.resetModules();
-  await import('../../../resume/resume.js');
+  await import('../../../src/site/resume/resume.js');
 }
 
 function initializePage(path) {

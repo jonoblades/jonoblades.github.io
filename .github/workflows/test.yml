@@ -29,5 +29,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       
-      - name: Run tests with coverage
-        run: yarn test
+      - name: Run tests
+        run: yarn test:run
+
+      - name: Validate Worker bundle
+        run: yarn check:site-visits

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import worker, { Dashboard } from '../../site-visits/server.js';
+import worker, { Dashboard } from '../../src/server/server.js';
 
 const pollIntervalMilliseconds = 15 * 60 * 1000;
 

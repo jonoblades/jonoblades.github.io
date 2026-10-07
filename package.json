@@ -2,7 +2,7 @@
   "name": "jonoblades.github.io",
   "version": "1.0.0",
   "description": "Jonoblades Homepage",
-  "main": "index.html",
+  "main": "src/site/index.html",
   "type": "module",
   "repository": "https://github.com/jonoblades/jonoblades.github.io.git",
   "author": "Jonathan <jonoblades@gmail.com>",
@@ -21,9 +21,9 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml",
-    "site-visits": "wrangler dev --config site-visits/wrangler.jsonc --port 4174 --var DASHBOARD_ORIGIN:http://localhost:4000",
-    "deploy:site-visits": "wrangler deploy --config site-visits/wrangler.jsonc",
-    "check:site-visits": "wrangler deploy --config site-visits/wrangler.jsonc --dry-run",
-    "dev:site-visits": "node site-visits/dev.js"
+    "site-visits": "wrangler dev --config src/server/wrangler.jsonc --port 4174 --var DASHBOARD_ORIGIN:http://localhost:4000",
+    "deploy:site-visits": "wrangler deploy --config src/server/wrangler.jsonc",
+    "check:site-visits": "wrangler deploy --config src/server/wrangler.jsonc --dry-run",
+    "dev:site-visits": "node src/server/dev.js"
   }
 }

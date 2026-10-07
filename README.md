@@ -54,12 +54,14 @@ Start the local Jekyll server:
 bundle exec jekyll serve
 ```
 
-Open `http://localhost:4000` in a browser. Jekyll writes generated output to `_site/`; edit the source files instead of
-editing generated files there.
+Run these commands from the repository root and open `http://localhost:4000` in a browser. The root `_config.yml`
+selects `src/site/` as Jekyll's source and writes generated output to `_site/`. Edit files in `src/site/`, not generated
+files in `_site/`. Public URL paths remain unchanged; `src/site/scripts/` is still served as `/scripts/`.
 
 ## Site visits dashboard
 
-GitHub Pages serves `/site-visits/` and its assets. A Cloudflare Worker routes all clients to one SQLite-backed
+GitHub Pages serves `/site-visits/` and its assets from `src/site/site-visits/`. The backend and Wrangler configuration
+live separately in `src/server/`, outside Jekyll's source tree. A Cloudflare Worker routes all clients to one SQLite-backed
 Durable Object, which stores the snapshot and global refresh throttle. Hibernating WebSockets keep idle connections
 without keeping the object active. Durable alarms refresh nine GoatCounter reports at most once every 15 minutes
 while clients are connected. Failed attempts count toward this interval, including after reconnects and deployments.
@@ -84,14 +86,14 @@ Check GoatCounter's rate limits separately. Each upstream request has a 10-secon
 
 ### Run locally
 
-Install JavaScript dependencies with `yarn install`. Store these values in the ignored `site-visits/.dev.vars`:
+Install JavaScript dependencies with `yarn install`. Store these values in the ignored `src/server/.dev.vars`:
 
 ```dotenv
 GOATCOUNTER_API_BASE_URL=https://YOUR-CODE.goatcounter.com/api/v0/stats
 GOATCOUNTER_API_TOKEN=YOUR-TOKEN
 ```
 
-Wrangler also supports the existing ignored `site-visits/.env` when `.dev.vars` is absent. Never put the token
+Wrangler also supports the existing ignored `src/server/.env` when `.dev.vars` is absent. Never put the token
 in Jekyll configuration, frontend code, or committed files.
 
 ```sh
@@ -110,15 +112,15 @@ After confirming the account uses Workers Free:
 yarn wrangler login
 yarn check:site-visits
 yarn deploy:site-visits
-yarn wrangler secret put GOATCOUNTER_API_BASE_URL --config site-visits/wrangler.jsonc
-yarn wrangler secret put GOATCOUNTER_API_TOKEN --config site-visits/wrangler.jsonc
+yarn wrangler secret put GOATCOUNTER_API_BASE_URL --config src/server/wrangler.jsonc
+yarn wrangler secret put GOATCOUNTER_API_TOKEN --config src/server/wrangler.jsonc
 ```
 
 Enter each value directly at the Wrangler prompt. The dashboard remains unavailable until both secrets exist.
 Set `dashboard_api_url` in `_config.yml` to the HTTPS Worker URL printed by deployment, then publish GitHub Pages.
 Until configured, the public frontend displays an unavailable state instead of connecting to localhost.
 The optional `?dashboard-api=https://YOUR-WORKER.workers.dev` parameter overrides the endpoint for testing.
-If the frontend domain changes, update `DASHBOARD_ORIGIN` in `site-visits/wrangler.jsonc`; this is an origin check,
+If the frontend domain changes, update `DASHBOARD_ORIGIN` in `src/server/wrangler.jsonc`; this is an origin check,
 not authentication, and the analytics are public.
 
 Run `yarn test:run tests/site-visits` for coordination, restored state, partial failure, disconnect, and browser
@@ -132,6 +134,7 @@ the code they cover:
 
 - `tests/scripts/` - shared services, base classes and site enhancements.
 - `tests/pages/` - page and game behavior for the resume, Sudoku and Wordley pages.
+- `tests/site-visits/` - the dashboard frontend and Worker backend.
 
 Run the test suite once:
 
@@ -152,7 +155,12 @@ yarn test:coverage
 ```
 
 Coverage is collected with V8 and the configured minimum threshold is 80% for statements, branches, functions and
-lines. HTML coverage output is written to `coverage/`.
+lines. Runtime code is collected from `src/site/` and `src/server/`; generated Wrangler files and the local development
+runner are excluded. HTML and LCOV output remain in `coverage/`, and the JUnit report remains at `test-report.junit.xml`.
+
+The Pages workflow builds `src/site/` using the root Jekyll configuration and uploads `_site/`. The test workflow runs
+the suite and validates the Worker bundle without deploying it. The coverage workflow uploads the root-level reports
+to Codecov and GitHub artifacts. Worker deployment remains the explicit `yarn deploy:site-visits` command.
 
 [![codecov](https://codecov.io/gh/jonoblades/jonoblades.github.io/graph/badge.svg?token=4MR3XADLM4)](https://codecov.io/gh/jonoblades/jonoblades.github.io)
 
@@ -160,17 +168,42 @@ lines. HTML coverage output is written to `coverage/`.
 
 ```text
 .
-├── _config.yml              # Jekyll site configuration
-├── _includes/               # Shared head, header, navigation and footer markup
-├── _layouts/                # Default and game page layouts
-├── games/                   # Games index, game pages and game data
-├── resume/                  # Resume page and supporting styles/scripts
-├── scripts/                 # Shared JavaScript and game-tile Web Component
-├── styles/                  # Global, game and variable-based stylesheets
-├── writing/                 # Writing page
-├── index.html               # About page
-├── Gemfile                  # GitHub Pages/Jekyll dependencies
-└── _site/                   # Generated Jekyll output
+├── .github/workflows/       # Pages, tests, and coverage CI
+├── src/
+│   ├── site/                # Jekyll source; public URLs omit this prefix
+│   │   ├── _fifty-words/    # Short fiction collection
+│   │   ├── _writing/        # Writing collection
+│   │   ├── _includes/       # Shared markup
+│   │   ├── _layouts/        # Jekyll layouts
+│   │   ├── _plugins/        # Collection archive generation
+│   │   ├── assets/          # Images and icons
+│   │   ├── games/           # Games and game data
+│   │   ├── privacy/
+│   │   ├── resume/
+│   │   ├── scripts/         # Shared site JavaScript and components
+│   │   ├── site-visits/     # Public dashboard HTML, CSS, and JavaScript
+│   │   ├── styles/
+│   │   ├── writing/
+│   │   ├── index.html
+│   │   ├── 404.html
+│   │   ├── offline.html
+│   │   ├── service-worker.js
+│   │   └── site.webmanifest
+│   └── server/
+│       ├── server.js        # Worker and singleton Durable Object
+│       ├── dashboard-service.js
+│       ├── wrangler.jsonc   # Worker deployment configuration
+│       └── dev.js           # Paired local Jekyll/Worker runner
+├── tests/                  # Frontend and backend tests
+├── _config.yml             # Shared/production Jekyll configuration
+├── _config.local.yml       # Local dashboard API override
+├── Gemfile                 # Ruby dependencies; lockfile remains at root
+├── package.json            # JavaScript dependencies and commands
+├── yarn.lock
+├── jsconfig.json           # Editor resolution for site JavaScript
+├── vitest.config.js
+├── _site/                  # Generated Pages artifact (ignored)
+└── coverage/               # Generated coverage reports (ignored)
 ```
 
 The published site is configured in `_config.yml` for GitHub Pages at `https://jonoblades.github.io`.

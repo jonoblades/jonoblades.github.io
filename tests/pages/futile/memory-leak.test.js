@@ -2,7 +2,7 @@
 // listener in `eventListeners`. With per-tile listeners this grew on every
 // render. With delegation it must stay constant.
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Futile } from '../../../games/futile/futile.js';
+import { Futile } from '../../../src/site/games/futile/futile.js';
 
 describe('event delegation (no listener growth)', () => {
   beforeEach(() => {

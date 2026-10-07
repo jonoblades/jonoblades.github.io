@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Selection } from '../../../games/futile/selection.js';
+import { Selection } from '../../../src/site/games/futile/selection.js';
 
 describe('Selection', () => {
   let sel;
