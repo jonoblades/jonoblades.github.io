@@ -274,18 +274,15 @@ function renderTimestamp(container, dashboard, name) {
   if (!container) {
     return;
   }
-  container.replaceChildren();
   const metadata = dashboard.reportMetadata?.[name];
   if (!metadata) {
-    container.textContent = 'Not yet updated.';
+    container.dataset.tooltip = 'Not yet updated.';
     return;
   }
-  const time = document.createElement('time');
-  time.dateTime = metadata.updatedAt;
-  time.textContent = new Date(metadata.updatedAt).toLocaleString('en-GB');
-  container.append('Updated ', time, `. ${metadata.range.start} to ${metadata.range.end}.`);
+  const tooltipText = `Updated ${new Date(metadata.updatedAt).toLocaleString('en-GB')}. ${metadata.range.start} to ${metadata.range.end}.`;
+  container.dataset.tooltip = tooltipText;
   if (dashboard.errors[name]) {
-    container.append(' Refresh failed; showing saved data.');
+    container.dataset.tooltip += ' Refresh failed; showing saved data.';
   }
 }
 
@@ -312,11 +309,12 @@ function renderDashboard(dashboard) {
     const section = document.createElement('section');
     section.className = 'dashboard-breakdown';
     const heading = document.createElement('h3');
-    const updated = document.createElement('p');
-    updated.className = 'report-updated';
+    const updated = document.createElement('span');
+    updated.className = 'info-icon';
     const content = document.createElement('div');
     heading.textContent = title;
-    section.append(heading, updated, content);
+    heading.append(updated);
+    section.append(heading, content);
     renderTimestamp(updated, dashboard, name);
     renderReport(content, dashboard.data[name], dashboard.errors[name], true);
     breakdowns.append(section);

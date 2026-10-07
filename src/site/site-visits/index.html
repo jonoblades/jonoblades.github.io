@@ -13,17 +13,15 @@ styles:
   </div>
 
   <section class="dashboard-overview" aria-labelledby="overview-title">
-    <div>
-      <h2 id="overview-title">Visits</h2>
+    <h2 id="overview-title">Visits <span id="visit-total-updated" class="info-icon"></span></h2>
+    <div class="dashboard-overview-details">
       <p id="visit-total" class="visit-total">-</p>
-      <p id="visit-total-updated" class="report-updated"></p>
+      <p class="dashboard-context">All tracked visits in the selected period.</p>
     </div>
-    <p class="dashboard-context">All tracked visits in the selected period.</p>
   </section>
 
   <section class="dashboard-trend" aria-labelledby="trend-title">
-    <h2 id="trend-title">Daily visits</h2>
-    <p id="visit-trend-updated" class="report-updated"></p>
+    <h2 id="trend-title">Daily visits <span id="visit-trend-updated" class="info-icon"></span></h2>    
     <div class="chart-frame">
       <canvas id="visit-trend" aria-label="Daily site visits"></canvas>
       <p id="visit-trend-empty" hidden>No visit trend is available for this period.</p>
@@ -31,8 +29,7 @@ styles:
   </section>
 
   <section aria-labelledby="pages-title">
-    <h2 id="pages-title">Top pages</h2>
-    <p id="top-pages-updated" class="report-updated"></p>
+    <h2 id="pages-title">Top pages <span id="top-pages-updated" class="info-icon"></span></h2>    
     <div id="top-pages"></div>
   </section>
 

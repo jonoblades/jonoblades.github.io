@@ -614,7 +614,9 @@ dialog {
     position-anchor: --tooltip-anchor;
     background-color: var(--colour-bg-contrast);
     color: var(--colour-bg);
-    font-size: 0.8rem;
+    font-size: 0.8rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.12em !important;
     padding: var(--spacing-small);
     border-radius: var(--spacing-small);
     white-space: pre-wrap;
@@ -785,6 +787,27 @@ pre {
         content: 'B';
       }
     }
+  }
+}
+
+.info-icon {
+  margin: var(--spacing-small) 0 var(--spacing-standard);
+  font-size: var(--font-size-standard);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+  width: 1.5rem;
+  letter-spacing: normal;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+
+  &::before {
+    content: 'i';
   }
 }
 

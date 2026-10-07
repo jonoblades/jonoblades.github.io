@@ -32,9 +32,9 @@ function pageMarkup() {
     <p id="dashboard-range"></p>
     <p id="dashboard-status"></p>
     <p id="visit-total"></p>
-    <p id="visit-total-updated"></p>
-    <p id="visit-trend-updated"></p>
-    <p id="top-pages-updated"></p>
+    <span id="visit-total-updated" class="info-icon"></span>
+    <span id="visit-trend-updated" class="info-icon"></span>
+    <span id="top-pages-updated" class="info-icon"></span>
     <input id="ThemeToggle" type="checkbox">
     <canvas id="visit-trend"></canvas>
     <p id="visit-trend-empty" hidden></p>
@@ -137,15 +137,49 @@ describe('site visits dashboard', () => {
   });
 
   it('renders retained failed reports with their own timestamps and date ranges', async () => {
+    const hitsMetadata = {
+      updatedAt: '2026-10-04T10:00:00.000Z',
+      range: { start: '2026-09-05', end: '2026-10-04' }
+    };
     await import('../../src/site/site-visits/site-visits.js');
     socket.dispatchEvent(new MessageEvent('message', {
-      data: JSON.stringify({ ...dashboard, stale: true, errors: { hits: 'Unavailable' } })
+      data: JSON.stringify({
+        ...dashboard,
+        stale: true,
+        errors: { hits: 'Unavailable' },
+        reportMetadata: { ...dashboard.reportMetadata, hits: hitsMetadata }
+      })
     }));
     expect(document.querySelector('#top-pages .report-list')).not.toBeNull();
-    expect(document.querySelector('#top-pages-updated time').dateTime).toBe('2026-10-05T12:00:00.000Z');
-    expect(document.querySelector('#top-pages-updated').textContent).toContain('2026-09-06 to 2026-10-05');
-    expect(document.querySelector('#top-pages-updated').textContent).toContain('showing saved data');
-    expect(document.querySelectorAll('.dashboard-breakdown time')).toHaveLength(7);
+    expect(document.querySelector('#top-pages-updated').dataset.tooltip).toBe(
+      `Updated ${new Date(hitsMetadata.updatedAt).toLocaleString('en-GB')}. 2026-09-05 to 2026-10-04. Refresh failed; showing saved data.`
+    );
+    const breakdownTooltips = document.querySelectorAll('.dashboard-breakdown .info-icon[data-tooltip]');
+    expect(breakdownTooltips).toHaveLength(7);
+    breakdownTooltips.forEach((icon) => {
+      expect(icon.dataset.tooltip).toBe(
+        `Updated ${new Date(dashboard.generatedAt).toLocaleString('en-GB')}. 2026-09-06 to 2026-10-05.`
+      );
+    });
+  });
+
+  it('renders the GoatCounter total and daily stats response format', async () => {
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new MessageEvent('message', {
+      data: JSON.stringify({
+        ...dashboard,
+        data: {
+          ...dashboard.data,
+          total: {
+            total: 11,
+            stats: [{ day: '2026-10-01', daily: 7 }, { day: '2026-10-02', daily: 4 }]
+          }
+        }
+      })
+    }));
+    expect(document.querySelector('#visit-total').textContent).toBe('11');
+    expect(Chart.mock.calls[0][1].data.labels).toEqual(['2026-10-01', '2026-10-02']);
+    expect(Chart.mock.calls[0][1].data.datasets[0].data).toEqual([7, 4]);
   });
 
   it('restores saved data and retains it while disconnected with delayed reconnects', async () => {
