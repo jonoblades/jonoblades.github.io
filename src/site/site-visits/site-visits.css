@@ -60,12 +60,15 @@
 .chart-frame {
   position: relative;
   height: 20rem;
-  max-height: min-content;
   margin-top: var(--spacing-standard);
 
   canvas {
     max-height: 100%;
     max-width: 100%;
+  }
+
+  &:not(:has(#visit-trend-empty[hidden])) {
+    height: auto;
   }
 }
 

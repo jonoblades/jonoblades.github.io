@@ -80,6 +80,15 @@ describe('Wordley page', () => {
     expect(document.activeElement).toBe(document.getElementById('guessForm').querySelector('.guess-letter'));
   });
 
+  it('uses constructor defaults for zero word-length and row options', async () => {
+    const { Wordley } = await loadWordley();
+    const game = new Wordley({ wordLength: 0, maxRows: 0 });
+    await game._ready();
+
+    expect(document.getElementById('lengthValue').textContent).toBe('5');
+    expect(document.querySelectorAll('#board .row')).toHaveLength(6);
+  });
+
   it('rejects incomplete and disallowed guesses with useful messages', async () => {
     const initialize = await loadWordley();
     await initializePage(initialize);
@@ -95,6 +104,17 @@ describe('Wordley page', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(document.getElementById('message').textContent).toBe('Word not in list.');
+  });
+
+  it('ignores a valid guess when its target row has been removed', async () => {
+    const initialize = await loadWordley();
+    await initializePage(initialize);
+    document.querySelector('.row[data-row="0"]').remove();
+
+    await enterGuess('cigar');
+
+    expect(document.getElementById('message').textContent).toBe('6 guesses remaining');
+    expect(document.getElementById('submitGuess').disabled).toBe(false);
   });
 
   it('scores a winning guess and disables the game', async () => {
@@ -202,6 +222,20 @@ describe('Wordley page', () => {
     await vi.waitFor(() => expect(document.getElementById('message').textContent).toContain('You win!'));
     expect(document.getElementById('turnIndicator').textContent).toBe('Player 2 wins!');
     expect(document.getElementById('turnIndicator').classList.contains('player-2')).toBe(true);
+  });
+
+  it('records a Player 1 win in two-player statistics', async () => {
+    localStorage.setItem('wordley_settings', JSON.stringify({ playerCount: 2 }));
+    const initialize = await loadWordley();
+    const game = await initializePage(initialize);
+
+    await enterGuess('cigar');
+
+    expect(game.getStats('twoPlayer', 5)).toMatchObject({
+      player1: { wins: 1, losses: 0 },
+      player2: { wins: 0, losses: 1 },
+      draws: 0
+    });
   });
 
   it('does not downgrade an existing alphabet status for repeated letters', async () => {
@@ -328,6 +362,7 @@ describe('Wordley page', () => {
     localStorage.setItem('wordley_settings', JSON.stringify({ timerDuration: 1, playerCount: 2 }));
     const initialize = await loadWordley();
     await initializePage(initialize);
+    Object.setPrototypeOf(document.querySelector('.row[data-row="0"] game-tile'), HTMLElement.prototype);
 
     document.querySelector('.guess-letter').dispatchEvent(new CustomEvent('tile-input', {
       bubbles: true,
@@ -390,6 +425,15 @@ describe('Wordley page', () => {
     const singlePlayer = document.querySelector('input[value="1"]');
     singlePlayer.dispatchEvent(new Event('change', { bubbles: true }));
     expect(document.querySelectorAll('#board .row')).toHaveLength(6);
+
+    const twoPlayer = document.querySelector('input[value="2"]');
+    twoPlayer.checked = true;
+    twoPlayer.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(document.querySelectorAll('#board .row')).toHaveLength(8));
+
+    singlePlayer.checked = true;
+    singlePlayer.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(document.querySelectorAll('#board .row')).toHaveLength(6));
 
     singlePlayer.value = 'invalid';
     singlePlayer.dispatchEvent(new Event('change', { bubbles: true }));
@@ -494,6 +538,9 @@ describe('Wordley page', () => {
 
     expect(document.getElementById('message').textContent).toContain('Out of guesses!');
     expect(document.getElementById('submitGuess').disabled).toBe(true);
+    const finishedMessage = document.getElementById('message').textContent;
+    timerCallback();
+    expect(document.getElementById('message').textContent).toBe(finishedMessage);
   });
 
   it('ignores submissions after a game has ended', async () => {
@@ -533,6 +580,7 @@ describe('Wordley page', () => {
     document.getElementById('settingsDialog').remove();
     document.getElementById('timerSelect').remove();
     document.getElementById('turnIndicator').remove();
+    document.getElementById('lengthValue').remove();
 
     const loaded = await loadWordley();
     await initializePage(loaded);
@@ -563,4 +611,77 @@ describe('Wordley page', () => {
     expect(document.getElementById('submitGuess').disabled).toBe(true);
   });
 
+  it('restores all nested current-format statistics groups', async () => {
+    const loaded = await loadWordley();
+    const settings = (await import('../../../src/site/scripts/Settings.js')).default;
+    settings.wordley_stats = {
+      singlePlayer: { 5: { 2: 4, failed: 1 } },
+      twoPlayer: {
+        player1: { 5: { wins: 3, losses: 2 } },
+        player2: { 5: { wins: 2, losses: 3 } },
+        draws: { 5: 1 }
+      }
+    };
+    const game = new loaded.Wordley();
+
+    expect(game.getStats('singlePlayer', 5)).toMatchObject({ 2: 4, failed: 1 });
+    expect(game.getStats('twoPlayer', 5)).toEqual({
+      player1: { wins: 3, losses: 2 },
+      player2: { wins: 2, losses: 3 },
+      draws: 1
+    });
+  });
+
+  it('rejects initialization when a required alphabet column or message is missing', async () => {
+    const { Wordley } = await loadWordley();
+    document.getElementById('alphaRight').remove();
+    await expect(new Wordley()._ready()).rejects.toThrow('Missing required alpha columns');
+
+    document.body.innerHTML = pageMarkup();
+    document.getElementById('message').remove();
+    const { Wordley: MissingMessageWordley } = await loadWordley();
+    await expect(new MissingMessageWordley()._ready()).rejects.toThrow('Missing required DOM elements');
+  });
+
+  it('skips rows when the template has no cloneable element', async () => {
+    document.getElementById('RowTemplate').content.replaceChildren();
+    const { Wordley } = await loadWordley();
+    const game = new Wordley();
+    await game._ready();
+    expect(document.querySelectorAll('#board .row')).toHaveLength(0);
+  });
+
+  it('falls back to a disabled timer when the timer selection is not numeric', async () => {
+    const loaded = await loadWordley();
+    await initializePage(loaded);
+    const timerSelect = document.getElementById('timerSelect');
+    timerSelect.add(new Option('Invalid', 'not-a-number'));
+    timerSelect.value = 'not-a-number';
+    timerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(JSON.parse(localStorage.getItem('wordley_settings')).timerDuration).toBe(0);
+  });
+
+  it('initializes statistics when a saved word length has no existing stats entry', async () => {
+    localStorage.setItem('wordley_settings', JSON.stringify({ wordLength: 7 }));
+    const loaded = await loadWordley();
+    document.querySelector('#RowTemplate').content.querySelector('.tiles')
+      .appendChild(document.createElement('game-tile'));
+    const extraInput = document.createElement('input');
+    extraInput.className = 'guess-letter';
+    extraInput.setAttribute('index', '6');
+    document.getElementById('guessForm').insertBefore(extraInput, document.getElementById('submitGuess'));
+    definitionsService.getWords.mockImplementation(async () => new Set(['seventh']));
+    definitionsService.validateWord.mockImplementation(async (word) => word === 'seventh');
+    const game = await initializePage(loaded);
+
+    await enterGuess('seventh');
+
+    expect(game.getStats('singlePlayer', 7)).toMatchObject({ 1: 1, failed: 0 });
+    expect(game.getStats('twoPlayer', 7)).toEqual({
+      player1: { wins: 0, losses: 0 },
+      player2: { wins: 0, losses: 0 },
+      draws: 0
+    });
+  });
 });

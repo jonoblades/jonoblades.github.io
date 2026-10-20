@@ -541,6 +541,182 @@ describe('checkForWin', () => {
   });
 });
 
+describe('turn watchdog', () => {
+  it('clears the busy guard when a meld action stalls', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    let completeMeld;
+    const createMeld = vi.spyOn(game, 'createMeld').mockImplementation(() => new Promise((resolve) => {
+      completeMeld = resolve;
+    }));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const meldButton = document.getElementById('meldButton');
+
+    meldButton.click();
+    meldButton.click();
+    expect(createMeld).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(warn).toHaveBeenCalledWith('watchdog cleared stale turnBusy flag');
+
+    completeMeld({ ok: false, reason: 'empty' });
+    await vi.waitFor(() => expect(document.getElementById('message').textContent)
+      .toBe('Select tiles from your hand or a meld first.'));
+  });
+
+  it('does not require a message element when rejecting an unselected pass', async () => {
+    document.body.innerHTML = '';
+    const game = new Futile(2, 0);
+
+    await expect(game.endTurn()).resolves.toBeUndefined();
+  });
+
+  it('ends the scheduled AI turn after the bot rejects', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    const error = new Error('bot failed');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const takeTurn = vi.spyOn(AIPlayer.prototype, 'takeTurn').mockRejectedValue(error);
+
+    document.querySelector('#tileRack game-tile[data-id]').click();
+    await game.endTurn();
+    await vi.runAllTimersAsync();
+
+    expect(consoleError).toHaveBeenCalledWith('AI error:', error);
+    expect(game.currentPlayer).toBe(game.humanPlayer);
+    takeTurn.mockRestore();
+  });
+
+  it('clears a pending busy action when a player-count restart schedules an AI turn', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 1);
+    await game._ready();
+    let completeMeld;
+    vi.spyOn(game, 'createMeld').mockImplementation(() => new Promise((resolve) => {
+      completeMeld = resolve;
+    }));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    document.getElementById('meldButton').click();
+    const playerCount = document.querySelector('input[name="playerCount"][value="3"]');
+    playerCount.checked = true;
+    playerCount.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(warn).toHaveBeenCalledWith(
+      'startTurn clearing stale turnBusy flag before scheduling AI'
+    ));
+
+    completeMeld({ ok: false, reason: 'empty' });
+    await Promise.resolve();
+    vi.clearAllTimers();
+    expect(game.players).toHaveLength(3);
+  });
+
+  it('clears a reentrant busy action before scheduling the next turn', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    const tile = document.querySelector('#tileRack game-tile[data-id]');
+    tile.click();
+    let completeMeld;
+    vi.spyOn(game, 'createMeld').mockImplementation(() => new Promise((resolve) => {
+      completeMeld = resolve;
+    }));
+    const originalRender = game.renderAllHands.bind(game);
+    let reentered = false;
+    vi.spyOn(game, 'renderAllHands').mockImplementation(() => {
+      originalRender();
+      if (!reentered) {
+        reentered = true;
+        document.getElementById('meldButton').click();
+      }
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await game.endTurn();
+    expect(warn).toHaveBeenCalledWith('endTurn clearing stale turnBusy flag');
+    completeMeld({ ok: false, reason: 'empty' });
+    await Promise.resolve();
+    vi.clearAllTimers();
+  });
+
+  it('counts pending passes and reuses the same AI bot across rounds', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    const takeTurn = vi.spyOn(AIPlayer.prototype, 'takeTurn')
+      .mockImplementation((currentGame) => currentGame.endTurn());
+
+    document.querySelector('#tileRack game-tile[data-id]').click();
+    await game.endTurn();
+    expect(game.checkForWin()).toBe(false);
+    await vi.runAllTimersAsync();
+
+    document.querySelector('#tileRack game-tile[data-id]').click();
+    await game.endTurn();
+    await vi.runAllTimersAsync();
+
+    expect(takeTurn).toHaveBeenCalledTimes(2);
+    expect(game.currentPlayer).toBe(game.humanPlayer);
+    takeTurn.mockRestore();
+  });
+
+  it('uses a fallback message for an unknown meld failure reason', async () => {
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(2, 0);
+    await game._ready();
+    vi.spyOn(game, 'createMeld').mockResolvedValue({ ok: false, reason: 'unknown-reason' });
+
+    document.getElementById('meldButton').click();
+    await vi.waitFor(() => expect(document.getElementById('message').textContent)
+      .toBe('That move is not allowed.'));
+  });
+
+  it('opens settings when the selected player and difficulty options are absent', async () => {
+    document.body.innerHTML = futileMarkup();
+    document.querySelector('input[name="playerCount"][value="2"]').remove();
+    document.querySelectorAll('input[name="difficulty"]').forEach((input) => input.remove());
+    const game = new Futile(2, 0);
+    const dialog = document.getElementById('settingsDialog');
+    dialog.showModal = vi.fn();
+    await game._ready();
+
+    document.getElementById('SettingsButton').click();
+
+    expect(dialog.showModal).toHaveBeenCalledOnce();
+  });
+
+  it('updates scores without score elements in player areas', async () => {
+    document.body.innerHTML = futileMarkup();
+    document.querySelectorAll('.player-score').forEach((score) => score.remove());
+    const game = new Futile(2, 0);
+    await game._ready();
+
+    expect(game.checkForWin()).toBe(false);
+  });
+
+  it('applies valid passes and ignores a missing pass in a three-player round', async () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = futileMarkup();
+    const game = new Futile(3, 0);
+    await game._ready();
+
+    document.querySelector('#tileRack game-tile[data-id]').click();
+    await game.endTurn();
+    await game.endTurn('missing-tile');
+    game.players[2].hand.splice(0);
+    await game.endTurn();
+
+    expect(game.currentPlayer).toBe(game.humanPlayer);
+    vi.clearAllTimers();
+  });
+});
+
 describe('AIPlayer drives the public API', () => {
   it('plays a direct meld and passes the turn', async () => {
     const g = new Futile(2, 0);
