@@ -19,9 +19,10 @@ class Resume extends BaseClass {
     const stylesheetId = 'CvStylesheet';
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
-    const mainArticle = document.getElementById('main-content').querySelector('article');
-    const tableOfContents = mainArticle?.querySelector('.t-o-c');
-    mainArticle?.insertBefore(buttonContainer, tableOfContents);
+    const mainContent = document.getElementById('main-content');
+    const tableOfContents = mainContent?.querySelector('.t-o-c');
+    const controlsParent = tableOfContents?.parentElement ?? mainContent?.querySelector('article');
+    controlsParent?.insertBefore(buttonContainer, tableOfContents);
 
     if (showCvMode) {
       this.#addCvLink(buttonContainer, false);
