@@ -49,6 +49,7 @@ describe('site visits dashboard', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.resetModules();
+    socket = undefined;
     localStorage.clear();
     vi.stubGlobal('IntersectionObserver', class {
       observe = vi.fn();
@@ -89,6 +90,7 @@ describe('site visits dashboard', () => {
 
   it('loads one snapshot and renders the fixed dashboard reports', async () => {
     await import('../../src/site/site-visits/site-visits.js');
+    document.querySelector('#ThemeToggle').dispatchEvent(new Event('change'));
     socket.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(dashboard) }));
 
     expect(fetch).not.toHaveBeenCalled();
@@ -134,6 +136,8 @@ describe('site visits dashboard', () => {
       chart: { scales: { y: { getPixelForValue } } }
     })).toBe(240);
     expect(getPixelForValue).toHaveBeenCalledWith(0);
+    document.querySelector('#ThemeToggle').dispatchEvent(new Event('change'));
+    expect(Chart.mock.results[0].value.destroy).toHaveBeenCalled();
   });
 
   it('renders retained failed reports with their own timestamps and date ranges', async () => {
@@ -215,5 +219,142 @@ describe('site visits dashboard', () => {
     expect(document.querySelector('#dashboard-status').textContent).toBe('GoatCounter unavailable');
     expect(document.querySelector('#visit-total').textContent).not.toBe('0');
     expect(document.querySelector('#top-pages').textContent).toContain('No saved dashboard data');
+  });
+
+  it('shows chart and report unavailable states when those resources are missing', async () => {
+    globalThis.Chart = undefined;
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new MessageEvent('message', {
+      data: JSON.stringify({
+        ...dashboard,
+        data: { ...dashboard.data, total: null, hits: null },
+        errors: { hits: 'Unavailable' }
+      })
+    }));
+
+    expect(document.querySelector('#visit-total').textContent).toBe('-');
+    expect(document.querySelector('#visit-trend').hidden).toBe(true);
+    expect(document.querySelector('#visit-trend-empty').textContent).toBe('Visit chart unavailable.');
+    expect(document.querySelector('#top-pages').textContent).toBe('This report is currently unavailable.');
+  });
+
+  it('handles malformed updates, socket errors, and reconnects after bfcache restoration', async () => {
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new MessageEvent('message', { data: '{invalid json' }));
+    expect(document.querySelector('#dashboard-status').textContent).toBe('Unable to read dashboard update.');
+
+    socket.dispatchEvent(new Event('error'));
+    expect(document.querySelector('#dashboard-status').textContent).toBe('Dashboard connection unavailable.');
+
+    const previousSocket = socket;
+    window.dispatchEvent(new Event('pagehide'));
+    const nonPersistedPageShow = new Event('pageshow');
+    Object.defineProperty(nonPersistedPageShow, 'persisted', { value: false });
+    window.dispatchEvent(nonPersistedPageShow);
+    expect(socket).toBe(previousSocket);
+    const pageShow = new Event('pageshow');
+    Object.defineProperty(pageShow, 'persisted', { value: true });
+    window.dispatchEvent(pageShow);
+    expect(previousSocket.close).toHaveBeenCalled();
+    expect(socket).not.toBe(previousSocket);
+  });
+
+  it('closes the socket when a heartbeat is not answered', async () => {
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new Event('open'));
+    await vi.advanceTimersByTimeAsync(60000);
+    await vi.advanceTimersByTimeAsync(30000);
+    expect(socket.close).toHaveBeenCalledWith(4000, 'Heartbeat timeout.');
+  });
+
+  it('normalizes mixed report values and renders chart fallbacks', async () => {
+    globalThis.getComputedStyle = vi.fn(() => ({
+      color: '',
+      backgroundColor: '',
+      borderTopColor: '',
+      outlineColor: ''
+    }));
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new MessageEvent('message', {
+      data: JSON.stringify({
+        ...dashboard,
+        lastAttemptAt: '2026-10-06T12:00:00.000Z',
+        reportMetadata: {},
+        data: {
+          ...dashboard.data,
+          total: [
+            { day: 'not-a-date', count: 'invalid' },
+            { day: '2026-10-01', daily: 0 },
+            { id: 'unknown', hits: '4' },
+            null,
+            3,
+            '2',
+            { visits: '1' },
+            { value: 1 },
+            { total: 1 },
+            { daily: 2 },
+            {}
+          ],
+          hits: [{ path: '/zero', count: 0 }],
+          toprefs: { unavailable: true }
+        }
+      })
+    }));
+
+    expect(document.querySelector('#visit-total').textContent).toBe('14');
+    expect(document.querySelector('#top-pages .report-bar').style.getPropertyValue('--report-bar-size')).toBe('0%');
+    expect(document.querySelector('.dashboard-breakdown').textContent).toContain('Nothing to display');
+    expect(document.querySelector('#visit-total-updated').dataset.tooltip).toBe('Not yet updated.');
+    const options = Chart.mock.calls[0][1].options;
+    expect(options.plugins.tooltip.callbacks.title([{ label: 'not-a-date' }])).toBe('not-a-date');
+    expect(options.scales.x.ticks.callback.call({ getLabelForValue: () => 'not-a-date' }, 0, 1, [])).toBe('not-a-date');
+    expect(options.scales.x.ticks.callback.call({ getLabelForValue: () => '2026-10-01' }, 0, 1, [])).toBe('OCT');
+    expect(Chart.mock.calls[0][1].data.datasets[0].backgroundColor({ chart: { chartArea: null } }))
+      .toBe('rgba(49, 151, 149, 0.18)');
+  });
+
+  it('ignores incomplete updates and keeps rendered data when local storage fails', async () => {
+    localStorage.setItem('site-visits:https://dashboard.example.test', '{invalid');
+    await import('../../src/site/site-visits/site-visits.js');
+    expect(document.querySelector('#dashboard-status').textContent).toBe('Connecting to dashboard...');
+
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage unavailable');
+    });
+    socket.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(dashboard) }));
+    const renderedStatus = document.querySelector('#dashboard-status').textContent;
+    expect(document.querySelector('#visit-total').textContent).toBe('5');
+    socket.dispatchEvent(new MessageEvent('message', { data: '{}' }));
+    expect(document.querySelector('#dashboard-status').textContent).toBe(renderedStatus);
+    expect(setItem).toHaveBeenCalled();
+    setItem.mockRestore();
+  });
+
+  it('skips connections without an API and rejects an insecure API on HTTPS pages', async () => {
+    const realWindow = window;
+    vi.stubGlobal('window', {
+      location: { search: '', hostname: 'example.test', protocol: 'https:' },
+      addEventListener: realWindow.addEventListener.bind(realWindow),
+      dispatchEvent: realWindow.dispatchEvent.bind(realWindow)
+    });
+    document.querySelector('script[data-dashboard-api]').remove();
+    await import('../../src/site/site-visits/site-visits.js');
+    expect(document.querySelector('#dashboard-status').textContent).toBe('Dashboard API is not configured.');
+    expect(socket).toBeUndefined();
+
+    window.dispatchEvent(new Event('pagehide'));
+    vi.resetModules();
+    document.body.innerHTML = pageMarkup().replace('https://dashboard.example.test', 'http://dashboard.example.test');
+    await import('../../src/site/site-visits/site-visits.js');
+    expect(document.querySelector('#dashboard-status').textContent).toBe('Dashboard unavailable. Retrying connection.');
+    expect(socket).toBeUndefined();
+  });
+
+  it('does not send heartbeats on a socket that is no longer open', async () => {
+    await import('../../src/site/site-visits/site-visits.js');
+    socket.dispatchEvent(new Event('open'));
+    socket.readyState = 3;
+    await vi.advanceTimersByTimeAsync(60000);
+    expect(socket.send).not.toHaveBeenCalled();
   });
 });

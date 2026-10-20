@@ -163,6 +163,42 @@ describe('dashboard Durable Object', () => {
     expect(response.status).toBe(503);
     expect(fetch).not.toHaveBeenCalled();
   });
+
+  it('requires a WebSocket upgrade and configured upstream credentials', async () => {
+    const ctx = createContext(createStorage());
+    const object = new Dashboard(ctx, {});
+    await ctx.ready;
+    const regularRequest = await object.fetch(new Request('https://worker.test/api/dashboard/events'));
+    expect(regularRequest.status).toBe(426);
+
+    const socketRequest = await object.fetch(new Request('https://worker.test/api/dashboard/events', {
+      headers: { Upgrade: 'websocket' }
+    }));
+    expect(socketRequest.status).toBe(503);
+
+    object.state.payload = { generatedAt: '2026-10-07T12:00:00.000Z' };
+    const snapshot = await object.fetch(new Request('https://worker.test/api/dashboard'));
+    expect(snapshot.status).toBe(200);
+    expect(await snapshot.json()).toEqual(object.state.payload);
+  });
+
+  it('closes sockets for protocol violations and socket errors', async () => {
+    const messageSocket = createSocket();
+    const messageContext = createContext(createStorage(), [messageSocket]);
+    const messageObject = new Dashboard(messageContext, upstream);
+    await messageContext.ready;
+    await messageObject.webSocketMessage(messageSocket);
+    expect(messageSocket.close).toHaveBeenCalledWith(1008);
+    expect(messageContext.storage.deleteAlarm).toHaveBeenCalled();
+
+    const errorSocket = createSocket();
+    const errorContext = createContext(createStorage(), [errorSocket]);
+    const errorObject = new Dashboard(errorContext, upstream);
+    await errorContext.ready;
+    await errorObject.webSocketError(errorSocket);
+    expect(errorSocket.close).toHaveBeenCalledWith(1011);
+    expect(errorContext.storage.deleteAlarm).toHaveBeenCalled();
+  });
 });
 
 describe('dashboard Worker routing', () => {
@@ -186,5 +222,13 @@ describe('dashboard Worker routing', () => {
   it('rejects unknown paths and handles preflight without invoking the object', async () => {
     expect((await worker.fetch(new Request('https://worker.test/missing'), {})).status).toBe(404);
     expect((await worker.fetch(new Request('https://worker.test/api/dashboard', { method: 'OPTIONS' }), {})).status).toBe(204);
+  });
+
+  it('rejects methods other than GET and OPTIONS', async () => {
+    const response = await worker.fetch(new Request('https://worker.test/api/dashboard', {
+      method: 'POST'
+    }), {});
+    expect(response.status).toBe(405);
+    expect(await response.json()).toEqual({ error: 'Method not allowed.' });
   });
 });

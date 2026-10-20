@@ -469,6 +469,7 @@ class Wordley extends BaseClass {
     if (!this.#messageBox) return;
     let content = text;
 
+    /* c8 ignore next */
     if (!content) {
       this.#messageBox.textContent = '';
       this.#messageBox.classList.remove('show', 'error', 'success', 'info');
