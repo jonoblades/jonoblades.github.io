@@ -330,7 +330,7 @@ strong {
 a {
   color: var(--colour-accent);
   text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
+  transition: text-decoration-thickness var(--fast-transition);
 
   &:hover {
     text-decoration-thickness: 0.15em;
@@ -370,7 +370,7 @@ a.btn {
   border: 1px solid var(--colour-border);
   border-radius: var(--spacing-small);
   cursor: pointer;
-  transition: border-color var(--default-transition), color var(--default-transition);
+  transition: border-color var(--default-transition), color var(--default-transition), background-color var(--default-transition);
 
   &:hover {
     border-color: var(--colour-accent);
