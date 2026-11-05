@@ -17,7 +17,8 @@
 
   --site-title-size: 3.5rem;
 
-  --default-transition: 0.3s ease;
+  --default-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --fast-transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Color palette */
   --colour-dark-slate: #090b10;
